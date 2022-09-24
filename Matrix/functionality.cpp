@@ -387,7 +387,7 @@ void Matrix::menu()
         }
     }
     // 2 Matrices
-    if ((choice > 9) && (choice < 14))
+    if ((choice > 9) && (choice < 15))
     {
         Matrix A = getMatrix("1");
         Matrix B = getMatrix("2");
