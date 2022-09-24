@@ -121,14 +121,14 @@ void Matrix::publishNew(int rows, int columns, vector<vector<double> > newMatrix
 string Matrix::generateName()
 {
     int title = 1;
-    string stringNum = "Matrix" + to_string(title) + ".txt";
+    string stringNum = "Matrices/Matrix" + to_string(title) + ".txt";
     ifstream test;
     test.open(stringNum);
     while(test.is_open())
     {
         test.close();
         title ++;
-        stringNum = "Matrix" + to_string(title) + ".txt";
+        stringNum = "Matrices/Matrix" + to_string(title) + ".txt";
         test.open(stringNum);
     }
     test.close();
@@ -362,6 +362,7 @@ void Matrix::menu()
         if (choice == 7)
         {
             A.eigenValues();
+            cout << "Here is the matrix we have so far:\n";
         }
         if (choice == 8)
         {

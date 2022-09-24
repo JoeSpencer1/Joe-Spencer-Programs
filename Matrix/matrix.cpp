@@ -25,6 +25,7 @@ Matrix::Matrix(string fileName)
     readMatrix >> width;
     checkValidity(readMatrix);
     double input;
+    size = 0;
     vector<double> row;
     for (int i = 0; i < height; i++)
     {
@@ -34,12 +35,14 @@ Matrix::Matrix(string fileName)
             if (!readMatrix.eof())
             {
                 readMatrix >> input;
+                size += input * input;
                 row.push_back(input);
             }
         }
         matrix.push_back(row);
         row.clear();
     }
+    size = sqrt(size);
     readMatrix.close();
     name = fileName;
 }
@@ -49,6 +52,15 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data)
     height = rows;
     width = columns;
     matrix = data;
+    size = 0;
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            size += matrix[i][j];
+        }
+    }
+    size = sqrt(size);
     if ((rows > 0) && (columns > 0))
     {
         name = longName(generateName());
@@ -63,6 +75,7 @@ Matrix::Matrix()
     vector<double> tempRow;
     do
     {
+        size = 0;
         valid = true;
         cout << "Please enter a height:\n";
         cin >> height;
@@ -81,6 +94,7 @@ Matrix::Matrix()
                 if (j == ' ')
                 {
                     tempRow.push_back(stod(strNum));
+                    size += stod(strNum) * stod(strNum);
                     strNum = "";
                 }
                 else
@@ -103,6 +117,7 @@ Matrix::Matrix()
         }
     }
     while (valid == false);
+    size = sqrt(size);
     if ((height > 0) && (width > 0))
     {
         name = longName(generateName());
@@ -391,7 +406,7 @@ Matrix Matrix::transpose()
             transpose[i].push_back(matrix[j][i]);
         }
     }
-    publish = Matrix(transpose.size(), transpose[0].size(), transpose);
+    Matrix publish = Matrix(transpose.size(), transpose[0].size(), transpose);
     cout << "Transpose published as " << publish.getName();
     return publish;
 }
@@ -588,45 +603,100 @@ void Matrix::eigenValues()
     */
 }
 
-vector<vector<vector<double> > > QR()
+vector<Matrix> Matrix::QR()
 {
-    double factor = 0;
+    /*
+    To do the QR decomposition, I need to find A_k=Q_k*R_k. 
+    After this, A_k+1=R_k*Q_k
+    */
     double length = 0;
     double parallel = 0;
+    double temppar = 0;
     double dotProduct = 0;
-    vector<vector<double> > tempmatrix;
-    vector<vector<vector<double> > > Q;
-    vector<vector<vector<double> > > R;
-    vector<vector<vector<double> > > QR;
+    double dQ;
+    double dR;
+    double error = 0;
+    vector<vector<double> > tempQ;
+    vector<vector<double> > tempR;
+    vector<vector<double> > tempE;
+    vector<double> tempRow;
+    vector<Matrix> QRf;
+    if (Q.size() == 0)
+    {
+        E.push_back(Matrix(height, width, matrix));
+    }
+    else
+    {
+        E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1]));
+    }
+    tempE = E[E.size() - 1].getMatrix();
     for (int i = 0; i < width; i++)
     {
         tempRow.push_back(0);
     }
     for (int i = 0; i < width; i++)
     {
-        tempMatrix.push_back(tempRow);
-    }
-    Q.push_back(tempMatrix);
-    R.push_back(tempMatrix);
-    for (int i = 0; i < height; i++)
-    {
-        factor += matrix[i][0] * matrix[i][0];
-    }
-    factor = sqrt(factor);
-    for (int i = 0; i < height; i++)
-    {
-        Q[0][i][0] = matrix[i][0] / factor;
+        tempQ.push_back(tempRow);
+        tempR.push_back(tempRow);
     }
     // For each column, you need to find the perpendicular component.
-    for (int i = 1; i < height; i++)
+    for (int i = 0; i < width; i++)
     {
         // You're going to have to redo this formula so it does it for all the rows before it.
         length = 0;
         parallel = 0;
         for (int j = 0; j < height; j++)
         {
-            length += matrix[j][i] * matrix[j][i];
-            parallel += matrix[j][i] * Q[0][i][0];
+            length += tempE[j][i] * tempE[j][i];
+            for (int k = 0; k < i; k++)
+            {
+                parallel += tempE[j][i] * tempR[j][k];
+            }
         }
+        parallel = sqrt(parallel);
+        for (int j = 0; j < height; j++)
+        {
+            tempQ[j][i] = tempE[j][i] * parallel / length;
+        }
+        for (int j = 0; j < i; j++)
+        {
+            temppar = 0;
+            for (int k = 0; k < height; k++)
+            {
+                temppar += tempR[k][j] * tempE[k][j];
+            }
+            tempR[j][i] = temppar;
+        }
+        tempR[i][i] = parallel;
+    }
+    Q.push_back(Matrix(height, width, tempQ));
+    R.push_back(Matrix(height, width, tempR));
+    tempQ = Q[Q.size() - 1].getMatrix();
+    tempR = R[R.size() - 1].getMatrix();
+    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1]);
+    E.push_back(newE);
+    if (Q.size() > 1)
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                dQ = tempQ[i][j];
+                dR = tempR[i][j];
+                error += dQ * dQ;
+                error += dR * dR;
+            }            
+        }
+    }
+    if (error <= size / 20)
+    {
+        QRf.push_back(Q[Q.size() - 1]);
+        QRf.push_back(R[R.size() - 1]);
+        return QRf;
+    }
+    else
+    {
+        QRf = QR();
+        return QRf;
     }
 }

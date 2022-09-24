@@ -28,7 +28,7 @@ public:
     double trace();
     void eigenValues();
     // You still need to figure out the QR() algorithm.
-    vector<vector<vector<double> > > QR();
+    vector<Matrix> QR();
     // The trace of the matrix is the sum of its eigenvalues
     // The determinant of the matrix is the product of its eigenvalues.
 /*void eigenVectors();*/
@@ -60,6 +60,10 @@ private:
     string name;
     int height;
     int width;
+    double size;
+    vector<Matrix> Q;
+    vector<Matrix> R;
+    vector<Matrix> E;
     vector<double> realEigen;
     vector<double> imaginaryEigen;
     vector<vector<double> > eigenVectors;
