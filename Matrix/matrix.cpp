@@ -605,10 +605,6 @@ void Matrix::eigenValues()
 
 vector<Matrix> Matrix::QR()
 {
-    /*
-    To do the QR decomposition, I need to find A_k=Q_k*R_k. 
-    After this, A_k+1=R_k*Q_k
-    */
     double length = 0;
     double parallel = 0;
     double temppar = 0;
@@ -621,6 +617,7 @@ vector<Matrix> Matrix::QR()
     vector<vector<double> > tempE;
     vector<double> tempRow;
     vector<Matrix> QRf;
+    // Get temporary Q and R matrices and E matrix.
     if (Q.size() == 0)
     {
         E.push_back(Matrix(height, width, matrix));
@@ -642,16 +639,24 @@ vector<Matrix> Matrix::QR()
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
-        // You're going to have to redo this formula so it does it for all the rows before it.
+        /*
+        This loop needs to find the values of each entry in the Q and R matrices.
+        The columns in the Q matrix are normalized, and the entries in the R matrix are
+        the component magnitude in the direction of the Q matrix. The first row in the
+        R matrix corresponds to the first column in the Q matrix. After the Q and R
+        matrices are created, the next matrix is found by E=QR -> E_next=RQ.
+        */
         length = 0;
         parallel = 0;
         for (int j = 0; j < height; j++)
         {
+            temppar = 0;
             length += tempE[j][i] * tempE[j][i];
             for (int k = 0; k < i; k++)
-            {
-                parallel += tempE[j][i] * tempR[j][k];
+            { 
+                temppar += tempE[j][i] * tempR[j][k];
             }
+            parallel += sqrt(temppar);
         }
         parallel = sqrt(parallel);
         for (int j = 0; j < height; j++)
