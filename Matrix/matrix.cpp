@@ -646,21 +646,22 @@ vector<Matrix> Matrix::QR()
         the component magnitude in the direction of the Q matrix. The first row in the
         R matrix corresponds to the first column in the Q matrix. After the Q and R
         matrices are created, the next matrix is found by E=QR -> E_next=RQ.
+        The steps for this are: 1: Find the column magnitude. 2: Dot the column with
+        previous columns to find the magnitude in their directions. 3: Add these 
+        magnitudes to the R matrix and subtract from the column. 4: Find magnitude of
+        what remainins of the column, normalize column, and add final entry to R matrix.
+        5: Cross-multiply R*Q to obtain next E.
         */
         length = 0;
         inDep = 0;
-        // This loop finds the length of the column.
+        // Step 1: This loop finds the length of the column.
         for (int j = 0; j < height; j++)
         {
             length += tempE[j][i] * tempE[j][i];
         }
         length = sqrt(length);
         inDep = length;
-        /* q
-//->        Next, this vector is crossed with all of the previous columns.
-        You need to find and subtract the vectors parallel to previous columns.
-        The lengths of these vectors go in the spaces on the R matrix.
-        */
+        // Step 2: Find magnitude in directions of previous columns
         for (int j = 0; j < i; j++)
         {
             temDep = 0;
@@ -723,6 +724,7 @@ vector<Matrix> Matrix::QR()
     }
     if (error >= size / 20)
     {
+        QRf.clear();
         QRf.push_back(Q[Q.size() - 1]);
         QRf.push_back(R[R.size() - 1]);
         return QRf;
