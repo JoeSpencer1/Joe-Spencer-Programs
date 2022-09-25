@@ -606,8 +606,8 @@ void Matrix::eigenValues()
 vector<Matrix> Matrix::QR()
 {
     double length = 0;
-    double parallel = 0;
-    double temppar = 0;
+    double inDep = 0;
+    double temDep = 0;
     double dotProduct = 0;
     double dQ;
     double dR;
@@ -616,6 +616,7 @@ vector<Matrix> Matrix::QR()
     vector<vector<double> > tempR;
     vector<vector<double> > tempE;
     vector<double> tempRow;
+    vector<double> tempCol;
     vector<Matrix> QRf;
     // Get temporary Q and R matrices and E matrix.
     if (Q.size() == 0)
@@ -647,32 +648,59 @@ vector<Matrix> Matrix::QR()
         matrices are created, the next matrix is found by E=QR -> E_next=RQ.
         */
         length = 0;
-        parallel = 0;
+        inDep = 0;
+        // This loop finds the length of the column.
         for (int j = 0; j < height; j++)
         {
-            temppar = 0;
+            length += tempE[j][i] * tempE[j][i];
+        }
+        length = sqrt(length);
+        inDep = length;
+        /* q
+//->        Next, this vector is crossed with all of the previous columns.
+        You need to find and subtract the vectors parallel to previous columns.
+        The lengths of these vectors go in the spaces on the R matrix.
+        */
+        for (int j = 0; j < i; j++)
+        {
+            temDep = 0;
+            for (int k = 0; k < height; k++)
+            {
+                temDep += tempQ[k][j] * tempE[k][i];
+                tempCol[k] = tempE[k][i];
+            }
+            temDep = sqrt(temDep);
+            inDep -= temDep;
+        }
+
+    //
+        for (int j = 0; j < height; j++)
+        {
+            temDep = 0;
             length += tempE[j][i] * tempE[j][i];
             for (int k = 0; k < i; k++)
             { 
-                temppar += tempE[j][i] * tempR[j][k];
+                temDep += tempE[j][i] * tempR[j][k];
             }
-            parallel += sqrt(temppar);
+            inDep += sqrt(temDep);
         }
-        parallel = sqrt(parallel);
+        inDep = sqrt(inDep);
+    //
+
         for (int j = 0; j < height; j++)
         {
-            tempQ[j][i] = tempE[j][i] * parallel / length;
+            tempQ[j][i] = tempE[j][i] * inDep / length;
         }
         for (int j = 0; j < i; j++)
         {
-            temppar = 0;
+            temDep = 0;
             for (int k = 0; k < height; k++)
             {
-                temppar += tempR[k][j] * tempE[k][j];
+                temDep += tempR[k][j] * tempE[k][j];
             }
-            tempR[j][i] = temppar;
+            tempR[j][i] = temDep;
         }
-        tempR[i][i] = parallel;
+        tempR[i][i] = inDep;
     }
     Q.push_back(Matrix(height, width, tempQ));
     R.push_back(Matrix(height, width, tempR));
@@ -693,7 +721,7 @@ vector<Matrix> Matrix::QR()
             }            
         }
     }
-    if (error <= size / 20)
+    if (error >= size / 20)
     {
         QRf.push_back(Q[Q.size() - 1]);
         QRf.push_back(R[R.size() - 1]);
