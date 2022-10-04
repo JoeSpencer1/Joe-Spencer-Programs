@@ -524,89 +524,19 @@ double Matrix::trace()
 
 void Matrix::eigenValues()
 {
-    vector<double> eigenVector;
-    double temp1;
-    double temp2;
-    double D0;
-    double D1;
-    double C;
-    bool valid = square();
-    int numTerms = matrix.size();
-    if ((valid == false) || (width > 2))
-    {
-        cout << "This program can only calculate eigenvalues\n";
-        cout << "for square matrices 2×2 and smaller.";
-        return;
-    }
-    else
-    {
-        vector<double> poly = createPolynomial();
-        if (width == 1)
-        {
-            realEigen.push_back(matrix[0][0]);
-            cout << "The eigenvalue of this matrix is " << realEigen[0] << endl;
-            cout << "Its eigenvecror is [1].\n";
-        }
-        if (width == 2)
-        {
-            temp1 = poly[1] * poly[1] - 4 * poly[0] * poly[2];
-            if (temp1 < 0)
-            {
-                temp1 *= -1;
-                imaginaryEigen.push_back(sqrt(temp1) / (2 * poly[2]));
-                imaginaryEigen.push_back(sqrt(temp1) / (-2 * poly[2]));
-                temp1 = -1 * poly[1] / (2 * poly[2]);
-                realEigen.push_back(temp1);
-                realEigen.push_back(temp1);
-                eigenVector.push_back((matrix[1][1] - realEigen[0]) / matrix[1][0]);
-                eigenVector.push_back(imaginaryEigen[0] / matrix[1][0]);
-                eigenVector.push_back(1);
-                eigenVectors.push_back(eigenVector);
-                eigenVector.clear();
-                eigenVector.push_back(eigenVectors[0][0]);
-                eigenVector.push_back(-1 * eigenVectors[0][1]);
-                eigenVector.push_back(1);
-                eigenVectors.push_back(eigenVector);
-                eigenVector.clear();
-                cout << "The eigenvalues of this matrix are" << endl << realEigen[0] << " + " << imaginaryEigen[0] << "i\n";
-                cout << " and " << realEigen[0] << " - " << imaginaryEigen[0] << "i\n";
-                cout << "Its eigenvectors are [" << eigenVectors[0][0] << " + " << abs(eigenVectors[0][1]) << "i, 1]\n";
-                cout << "and [" << eigenVectors[1][0] << " - " << abs(eigenVectors[1][1]) << "i, 1]\n";
-            }
-            else
-            {
-                imaginaryEigen.push_back(0);
-                imaginaryEigen.push_back(0);
-                temp1 = sqrt(temp1) / (2 * poly[2]);
-                temp2 = -1 * poly[1] / (2 * poly[2]);
-                realEigen.push_back(temp2 + temp1);
-                eigenVector.push_back((matrix[1][1] - realEigen[0]) / matrix[1][0]);
-                eigenVector.push_back(1);
-                eigenVectors.push_back(eigenVector);
-                eigenVector.clear();
-                realEigen.push_back(temp2 - temp1);
-                eigenVector.push_back((matrix[1][1] - realEigen[1]) / matrix[1][0]);
-                eigenVector.push_back(1);
-                eigenVectors.push_back(eigenVector);
-                eigenVector.clear();
-                cout << "The eigenvalues of this matrix are " << realEigen[0] << " and " << realEigen[1] << endl;
-                cout << "Its eigenvectors are [" << eigenVectors[0][0] << " , " << eigenVectors[0][1] << "]\n";
-                cout << "and [" << eigenVectors[1][0] << " , " << eigenVectors[1][1] << "]\n";
-            }
-        }
-    }
-    /*
-    The sum of the eigenvalues is the discriminant, the product is the determinant.
-    Doing row
-    2 3 -> 2-λ 3 -> 2-λ 3            -> 2-λ 3
-    4 6    4 6-λ    2-λ (6-λ)(2-λ)/4    0 (6-λ)(2-λ)/4-3
-    */
+    vector<Matrix> QRf = QR();
+    Matrix Q = QRf[0];
+    Matrix R = QRf[1];
+    cout << "R:\n";
+    R.printMatrix();
+    cout << "\nQ:\n";
+    Q.printMatrix();
+    return;
 }
 
 vector<Matrix> Matrix::QR()
 {
-    double lim = 20;
-    // I need to update this error limit.
+cout << "1\n";
     double length = 0;
     double inDep = 0;
     double temDep = 0;
@@ -638,6 +568,7 @@ vector<Matrix> Matrix::QR()
         tempQ.push_back(tempRow);
         tempR.push_back(tempRow);
     }
+cout << "2\n";
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
@@ -664,6 +595,7 @@ vector<Matrix> Matrix::QR()
         inDep = length;
         size += length;
         // Step 2: Find magnitude in directions of previous columns
+cout << "3\n";
         for (int j = 0; j < i; j++)
         {
             temDep = 0;
@@ -688,6 +620,7 @@ vector<Matrix> Matrix::QR()
     // This section checks if the matrix has been solved within the tolerance.
     if (E.size() > 1)
     {
+cout << "4\n";
         oldE = E[E.size() - 2].getMatrix();
         for (int i = 0; i < width; i++)
         {
@@ -696,17 +629,16 @@ vector<Matrix> Matrix::QR()
                 error += (newE.getMatrix()[i][j] - oldE[i][j]) * (newE.getMatrix()[i][j] - oldE[i][j]);
             }            
         }
+        if (error <= size / error)
+        {
+cout << "5\n";
+            QRf.clear();
+            QRf.push_back(Q[Q.size() - 1]);
+            QRf.push_back(R[R.size() - 1]);
+            return QRf;
+        }
     }
-    if (error <= size / error)
-    {
-        QRf.clear();
-        QRf.push_back(Q[Q.size() - 1]);
-        QRf.push_back(R[R.size() - 1]);
-        return QRf;
-    }
-    else
-    {
-        QRf = QR();
-        return QRf;
-    }
+cout << "6\n";
+    QRf = QR();
+    return QRf;
 }
