@@ -536,7 +536,6 @@ void Matrix::eigenValues()
 
 vector<Matrix> Matrix::QR()
 {
-cout << "1\n";
     double length = 0;
     double inDep = 0;
     double temDep = 0;
@@ -544,10 +543,8 @@ cout << "1\n";
     double error = 0;
     vector<vector<double> > tempQ;
     vector<vector<double> > tempR;
-    vector<vector<double> > tempE;
     vector<vector<double> > oldE;
     vector<double> tempRow;
-    vector<double> tempCol;
     vector<Matrix> QRf;
     // Get temporary Q and R matrices and E matrix.
     if (Q.size() == 0)
@@ -558,7 +555,7 @@ cout << "1\n";
     {
         E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1]));
     }
-    tempE = E[E.size() - 1].getMatrix();
+    oldE = E[E.size() - 1].getMatrix();
     for (int i = 0; i < width; i++)
     {
         tempRow.push_back(0);
@@ -568,7 +565,6 @@ cout << "1\n";
         tempQ.push_back(tempRow);
         tempR.push_back(tempRow);
     }
-cout << "2\n";
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
@@ -580,48 +576,53 @@ cout << "2\n";
         matrices are created, the next matrix is found by E=QR -> E_next=RQ.
         The steps for this are: 1: Find the column magnitude. 2: Dot the column with
         previous columns to find the magnitude in their directions. 3: Add these 
-        magnitudes to the R matrix and subtract from the column. 4: Find magnitude of
-        what remainins of the column, normalize column, and add final entry to R matrix.
-        5: Cross-multiply R*Q to obtain next E.
+        magnitudes to the R matrix and subtract from the column. 4: Subrtract previous 
+        columns of the Q matrix from this vector to obtain remaining Q column. 
+        5: Find magnitude of what remainins of the column, normalize column, and add 
+        final entry to R matrix. 6: Cross-multiply R*Q to obtain next E.
         */
         length = 0;
-        inDep = 0;
         // Step 1: This loop finds the length of the column.
         for (int j = 0; j < height; j++)
         {
-            length += tempE[j][i] * tempE[j][i];
+            length += oldE[j][i] * oldE[j][i];
+            tempQ[j][i] = oldE[j][i];
         }
         length = sqrt(length);
         inDep = length;
-        size += length;
         // Step 2: Find magnitude in directions of previous columns
-cout << "3\n";
         for (int j = 0; j < i; j++)
         {
             temDep = 0;
             for (int k = 0; k < height; k++)
             {
-                temDep += tempQ[k][j] * tempE[k][i];
-                tempCol[k] = tempE[k][i];
+                temDep += tempQ[k][j] * tempQ[k][i];
             }
             // Setp 3: Add these magnitudes to the R matrix
-            temDep = sqrt(temDep);
-            inDep -= temDep;
+            inDep = sqrt(length * length - temDep * temDep);
             tempR[j][i] = temDep;
+            // Step 4: Subtract previous Q vectors to find remaining vector.
+            for (int k = 0; k < height; k++)
+            {
+                tempQ[k][i] -= tempQ[k][j] * temDep;
+            }
         }
-        // Step 4: Place remaining magnitude on diagonal of R matrix
+// I'm pretty sure the error occurs here. Q should be normalized, but it isn't getting normalized.
+        for (int j = 0; j < height; j++)
+        {
+            tempQ[j][i] /= inDep;
+        }
+        // Step 5: Place remaining magnitude on diagonal of R matrix
         tempR[i][i] = inDep;
     }
     Q.push_back(Matrix(height, width, tempQ));
     R.push_back(Matrix(height, width, tempR));
-    // Step 5: Cross-multiply R*Q to obtain next matrix.
+    // Step 6: Cross-multiply R*Q to obtain next matrix.
     Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1]);
     E.push_back(newE);
     // This section checks if the matrix has been solved within the tolerance.
     if (E.size() > 1)
     {
-cout << "4\n";
-        oldE = E[E.size() - 2].getMatrix();
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < width; j++)
@@ -629,16 +630,14 @@ cout << "4\n";
                 error += (newE.getMatrix()[i][j] - oldE[i][j]) * (newE.getMatrix()[i][j] - oldE[i][j]);
             }            
         }
-        if (error <= size / error)
+        if ((E.size() == 20) || (error <= length / error))
         {
-cout << "5\n";
             QRf.clear();
             QRf.push_back(Q[Q.size() - 1]);
             QRf.push_back(R[R.size() - 1]);
             return QRf;
         }
     }
-cout << "6\n";
     QRf = QR();
     return QRf;
 }
