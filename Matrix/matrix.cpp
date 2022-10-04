@@ -605,16 +605,17 @@ void Matrix::eigenValues()
 
 vector<Matrix> Matrix::QR()
 {
+    double lim = 20;
+    // I need to update this error limit.
     double length = 0;
     double inDep = 0;
     double temDep = 0;
     double dotProduct = 0;
-    double dQ;
-    double dR;
     double error = 0;
     vector<vector<double> > tempQ;
     vector<vector<double> > tempR;
     vector<vector<double> > tempE;
+    vector<vector<double> > oldE;
     vector<double> tempRow;
     vector<double> tempCol;
     vector<Matrix> QRf;
@@ -661,6 +662,7 @@ vector<Matrix> Matrix::QR()
         }
         length = sqrt(length);
         inDep = length;
+        size += length;
         // Step 2: Find magnitude in directions of previous columns
         for (int j = 0; j < i; j++)
         {
@@ -670,59 +672,32 @@ vector<Matrix> Matrix::QR()
                 temDep += tempQ[k][j] * tempE[k][i];
                 tempCol[k] = tempE[k][i];
             }
+            // Setp 3: Add these magnitudes to the R matrix
             temDep = sqrt(temDep);
             inDep -= temDep;
-        }
-
-    //
-        for (int j = 0; j < height; j++)
-        {
-            temDep = 0;
-            length += tempE[j][i] * tempE[j][i];
-            for (int k = 0; k < i; k++)
-            { 
-                temDep += tempE[j][i] * tempR[j][k];
-            }
-            inDep += sqrt(temDep);
-        }
-        inDep = sqrt(inDep);
-    //
-
-        for (int j = 0; j < height; j++)
-        {
-            tempQ[j][i] = tempE[j][i] * inDep / length;
-        }
-        for (int j = 0; j < i; j++)
-        {
-            temDep = 0;
-            for (int k = 0; k < height; k++)
-            {
-                temDep += tempR[k][j] * tempE[k][j];
-            }
             tempR[j][i] = temDep;
         }
+        // Step 4: Place remaining magnitude on diagonal of R matrix
         tempR[i][i] = inDep;
     }
     Q.push_back(Matrix(height, width, tempQ));
     R.push_back(Matrix(height, width, tempR));
-    tempQ = Q[Q.size() - 1].getMatrix();
-    tempR = R[R.size() - 1].getMatrix();
+    // Step 5: Cross-multiply R*Q to obtain next matrix.
     Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1]);
     E.push_back(newE);
-    if (Q.size() > 1)
+    // This section checks if the matrix has been solved within the tolerance.
+    if (E.size() > 1)
     {
+        oldE = E[E.size() - 2].getMatrix();
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < width; j++)
             {
-                dQ = tempQ[i][j];
-                dR = tempR[i][j];
-                error += dQ * dQ;
-                error += dR * dR;
+                error += (newE.getMatrix()[i][j] - oldE[i][j]) * (newE.getMatrix()[i][j] - oldE[i][j]);
             }            
         }
     }
-    if (error >= size / 20)
+    if (error <= size / error)
     {
         QRf.clear();
         QRf.push_back(Q[Q.size() - 1]);
