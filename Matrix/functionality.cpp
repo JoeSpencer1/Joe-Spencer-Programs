@@ -362,7 +362,6 @@ void Matrix::menu()
         if (choice == 7)
         {
             A.eigenValues();
-            cout << "Here is the matrix we have so far:\n";
         }
         if (choice == 8)
         {
