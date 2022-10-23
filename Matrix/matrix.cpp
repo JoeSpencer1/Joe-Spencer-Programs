@@ -570,6 +570,7 @@ vector<Matrix> Matrix::QR()
     vector<vector<double> > tempQ;
     vector<vector<double> > tempR;
     vector<vector<double> > oldE;
+    vector<double> lengths;
     vector<double> tempRow;
     vector<Matrix> QRf;
     // Get temporary Q and R matrices and E matrix.
@@ -586,6 +587,7 @@ vector<Matrix> Matrix::QR()
     {
         tempRow.push_back(0);
     }
+lengths = tempRow;
     for (int i = 0; i < width; i++)
     {
 //        tempQ.push_back(tempRow);
@@ -623,11 +625,24 @@ tempR[j][i] = temDep;
             length += tempQ[j][i] * tempQ[j][i];
         }
         length = sqrt(length);
-tempR[i][i] = length;
         for (int j = 0; j < height; j++)
         {
             tempQ[j][i] /= length;
         }
+lengths[i]=length;
+tempR[i][i] = length; 
+    }
+tempR[height - 1][width - 1] = lengths[height - 1];
+    for (int i = 0; i < width - 1; i++)
+    {
+        length = 0;
+        for (int j = 0; j < height; j++)
+        {
+            length += tempQ[j][i] * tempQ[j][i + 1];
+        }
+        length = lengths[i] * length;
+        tempR[i][i] = lengths[i] - length;
+        tempR[i + 1][i] = length;
     }
 //    for (int i = 0; i < width; i++){for (int j = 0; j < height; j++){cout << tempQ[i][j] << " ";}cout << endl;}cout << endl;
     // Step 4: Find R by E=QR->R=Q'E
@@ -652,9 +667,8 @@ Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
                 error += (newE.getMatrix()[i][j] - oldE[i][j]) * (newE.getMatrix()[i][j] - oldE[i][j]);
             }            
         }
-        if ((error <= length * length) || (E.size() == 10))
+        if ((error <= length * length) || (E.size() == 30))
         {
-cout << "Done";
             QRf.clear();
             QRf.push_back(Q[Q.size() - 1]);
             QRf.push_back(R[R.size() - 1]);
