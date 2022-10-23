@@ -45,6 +45,7 @@ Matrix::Matrix(string fileName)
     size = sqrt(size);
     readMatrix.close();
     name = fileName;
+    publish = true;
 }
 
 Matrix::Matrix(int rows, int columns, vector<vector<double> > data)
@@ -65,6 +66,24 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data)
     {
         name = longName(generateName());
     }
+    publish = true;
+}
+
+Matrix::Matrix(int rows, int columns, vector<vector<double> > data, bool keep)
+{
+    height = rows;
+    width = columns;
+    matrix = data;
+    size = 0;
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            size += matrix[i][j];
+        }
+    }
+    size = sqrt(size);
+    publish = false;
 }
 
 Matrix::Matrix()
@@ -122,12 +141,16 @@ Matrix::Matrix()
     {
         name = longName(generateName());
     }
+    publish = true;
 }
 
 Matrix::~Matrix()
 {
     // This segment publishes the matrix and then deletes it
-    publishFile();
+    if (publish == true)
+    {
+        publishFile();
+    }
 };
 
 Matrix Matrix::add(Matrix Other)
@@ -198,7 +221,7 @@ Matrix Matrix::scale(double constant)
     return Matrix(getHeight(), getWidth(), tempMatrix);
 }
 
-Matrix Matrix::cross(Matrix Other)
+Matrix Matrix::cross(Matrix Other, bool keep)
 {
     bool compatiable = checkCompatibility(Other);
     double tempNum = 0;
@@ -278,7 +301,10 @@ Matrix Matrix::cross(Matrix Other)
                 tempRow.clear();
             }
         }
-        publishNew(getHeight(), Other.getWidth(), newMatrix);
+        if (keep == true)
+        {
+            publishNew(getHeight(), Other.getWidth(), newMatrix);
+        }
         return Matrix(newMatrix.size(), newMatrix[0].size(), newMatrix);
     }
     else 
@@ -499,7 +525,7 @@ void Matrix::solve(Matrix solution)
         }
         else
         {
-            Matrix answer = inverse.cross(solution);
+            Matrix answer = inverse.cross(solution, true);
             answer.printMatrix();
         }
     }
@@ -553,7 +579,7 @@ vector<Matrix> Matrix::QR()
     }
     else
     {
-        E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1]));
+        E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1], false));
     }
     oldE = E[E.size() - 1].getMatrix();
     for (int i = 0; i < width; i++)
@@ -605,10 +631,10 @@ vector<Matrix> Matrix::QR()
     // Step 4: Find R by R=Q'A
     Q.push_back(Matrix(height, width, tempQ));
     Matrix newQ = Q[Q.size() - 1].transpose();
-    Matrix newR = newQ.cross(E[E.size() - 1]);
+    Matrix newR = newQ.cross(E[E.size() - 1], false);
     R.push_back(newR);
     // Step 6: Cross-multiply R*Q to obtain next matrix.
-    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1]);
+    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
     E.push_back(newE);
     // This section checks if the matrix has been solved within the tolerance.
     if (E.size() > 1)
@@ -620,7 +646,7 @@ vector<Matrix> Matrix::QR()
                 error += (newE.getMatrix()[i][j] - oldE[i][j]) * (newE.getMatrix()[i][j] - oldE[i][j]);
             }            
         }
-        if (error <= length * length)
+        if ((error <= length * length) || (E.size() == 100))
         {
 cout << "Done";
             QRf.clear();

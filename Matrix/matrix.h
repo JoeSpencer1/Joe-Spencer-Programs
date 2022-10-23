@@ -11,13 +11,14 @@ class Matrix
 public:
     Matrix(string filename);
     Matrix(int rows, int columns, vector<vector<double> > data);
+    Matrix(int rows, int columns, vector<vector<double> > data, bool keep);
     Matrix();
     ~Matrix();
     // These functions are all useful matrix operations.
     Matrix add(Matrix Other);
     Matrix subtract(Matrix Other);
     Matrix scale(double constant);
-    Matrix cross(Matrix Other);
+    Matrix cross(Matrix Other, bool keep);
     double characteristic();
     Matrix invert();
     Matrix transpose();
@@ -73,6 +74,7 @@ private:
     vector<int> numMenu;
     vector<double> polynomial;
     double pi = 3.141592653238;
+    bool publish;
 };
 
 #endif

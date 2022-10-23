@@ -405,7 +405,7 @@ void Matrix::menu()
                 }
                 else
                 {
-                    Matrix D = C.cross(B);
+                    Matrix D = C.cross(B, true);
                     cout << "Ax = b: x =\n";
                     D.printMatrix();
                 }
@@ -427,7 +427,7 @@ void Matrix::menu()
         }
         if (choice == 14)
         {
-            Matrix C = A.cross(B);
+            Matrix C = A.cross(B, true);
             C.printMatrix();
             addToList(C);
             cout << "Product added to position " << matrixMenu.size() << endl;
