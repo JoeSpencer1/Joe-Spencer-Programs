@@ -568,7 +568,7 @@ vector<Matrix> Matrix::QR()
     double dotProduct = 0;
     double error = 0;
     vector<vector<double> > tempQ;
-    vector<vector<double> > tempR;
+//    vector<vector<double> > tempR;
     vector<vector<double> > oldE;
     vector<double> lengths;
     vector<double> tempRow;
@@ -587,11 +587,10 @@ vector<Matrix> Matrix::QR()
     {
         tempRow.push_back(0);
     }
-lengths = tempRow;
     for (int i = 0; i < width; i++)
     {
 //        tempQ.push_back(tempRow);
-tempR.push_back(tempRow);
+//tempR.push_back(tempRow);
     }
     // Step 1: Dot column with previous columns and subtract them
     tempQ = E[E.size() - 1].getMatrix();
@@ -616,7 +615,6 @@ tempR.push_back(tempRow);
             {
                 tempQ[k][i] -= temDep * tempQ[k][j];
             }
-tempR[j][i] = temDep;
         }
         // Step 3: Find new magnitude of Q and normalize
         length = 0;
@@ -629,33 +627,19 @@ tempR[j][i] = temDep;
         {
             tempQ[j][i] /= length;
         }
-lengths[i]=length;
-tempR[i][i] = length; 
-    }
-tempR[height - 1][width - 1] = lengths[height - 1];
-    for (int i = 0; i < width - 1; i++)
-    {
-        length = 0;
-        for (int j = 0; j < height; j++)
-        {
-            length += tempQ[j][i] * tempQ[j][i + 1];
-        }
-        length = lengths[i] * length;
-        tempR[i][i] = lengths[i] - length;
-        tempR[i + 1][i] = length;
     }
 //    for (int i = 0; i < width; i++){for (int j = 0; j < height; j++){cout << tempQ[i][j] << " ";}cout << endl;}cout << endl;
     // Step 4: Find R by E=QR->R=Q'E
 // This appears to be where the error occurs. It should be upper triangular, but it's not.
     Q.push_back(Matrix(height, width, tempQ));
-/*    Matrix newQ = Q[Q.size() - 1].transpose();
-    Matrix newR = newQ.cross(E[E.size() - 1], false); 
+    Matrix Qt = Q[Q.size() - 1].transpose();
+    Matrix newR = Qt.cross(E[E.size() - 1], false); 
 newR.printMatrix();
     R.push_back(newR); 
     // Step 6: Cross-multiply R*Q to obtain next matrix.
-    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false); */
-    R.push_back(Matrix(height, width, tempR));
-Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
+    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
+//R.push_back(Matrix(height, width, tempR));
+//Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
     E.push_back(newE);
     // This section checks if the matrix has been solved within the tolerance.
     if (E.size() > 1)
@@ -664,7 +648,7 @@ Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
         {
             for (int j = 0; j < width; j++)
             {
-                error += (newE.getMatrix()[i][j] - oldE[i][j]) * (newE.getMatrix()[i][j] - oldE[i][j]);
+//                error += (newE.getMatrix()[i][j] - oldE[i][j]) * (newE.getMatrix()[i][j] - oldE[i][j]);
             }            
         }
         if ((error <= length * length) || (E.size() == 30))
