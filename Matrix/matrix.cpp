@@ -562,95 +562,99 @@ void Matrix::eigenValues()
 
 vector<Matrix> Matrix::QR()
 {
-    double length = 0;
-    double inDep = 0;
-    double temDep = 0;
-    double dotProduct = 0;
-    double error = 0;
-    vector<vector<double> > tempQ;
-    vector<vector<double> > oldE;
-    vector<double> lengths;
-    vector<double> tempRow;
+    // double length = 0;
+    // double inDep = 0;
+    // double temDep = 0;
+    // double dotProduct = 0;
+    // double error = 0;
+    // vector<vector<double> > tempQ;
+    // vector<vector<double> > oldE;
+    // vector<double> lengths;
+    // vector<double> tempRow;
+    // vector<Matrix> QRf;
+    // // Get temporary Q and R matrices and E matrix.
+    // if (Q.size() == 0)
+    // {
+    //     E.push_back(Matrix(height, width, matrix));
+    // }
+    // else
+    // {
+    //     E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1], false));
+    // }
+    // oldE = E[E.size() - 1].getMatrix();
+    // for (int i = 0; i < width; i++)
+    // {
+    //     tempRow.push_back(0);
+    // }
+    // tempQ = E[E.size() - 1].getMatrix();
+    // // For each column, you need to find the perpendicular component.
+    // for (int i = 0; i < width; i++)
+    // {
+    // /*
+    // Steps: 1: Dot the column with previous columns and subtract them to 
+    // isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
+    // basis for Q. 3: Find the new magnitude of Q and normalize it. 4: Determine value of R
+    // by R=Q'A. 5: Find next value of A by A'=RQ
+    // */
+    //     for (int j = 0; j < i; j++) // Cylces through previous columns
+    //     {
+    //         temDep = 0;
+    //         for (int k = 0; k < height; k++) // Find dot product with previous column
+    //         {
+    //             temDep += tempQ[k][j] * tempQ[k][i];
+    //         }
+    //         // Step 2: Subtract dependant columns
+    //         for (int k = 0; k < height; k++)
+    //         {
+    //             tempQ[k][i] -= temDep * tempQ[k][j];
+    //         }
+    //     }
+    //     // Step 3: Find new magnitude of Q and normalize
+    //     length = 0;
+    //     for (int j = 0; j < height; j++)
+    //     {
+    //         length += tempQ[j][i] * tempQ[j][i];
+    //     }
+    //     length = sqrt(length);
+    //     for (int j = 0; j < height; j++)
+    //     {
+    //         tempQ[j][i] /= length;
+    //     }
+    // }
+    // // Step 4: Find R by E=QR->R=Q'E
+    // Q.push_back(Matrix(height, width, tempQ));
+    // Matrix Qt = Q[Q.size() - 1].transpose();
+    // Matrix newR = Qt.cross(E[E.size() - 1], false); 
+    // R.push_back(newR); 
+    // // Step 6: Cross-multiply R*Q to obtain next matrix.
+    // Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
+    // E.push_back(newE);
+    // // This section checks if the matrix has been solved within the tolerance.
+    // if (E.size() > 1)
+    // {
+    //     for (int i = 0; i < width; i++)
+    //     {
+    //         for (int j = 0; j < width; j++)
+    //         {
+    //         }            
+    //     }
+    //     if ((error <= length * length) || (E.size() == 50))
+    //     {
+    //         QRf.clear();
+    //         QRf.push_back(Q[Q.size() - 1]);
+    //         QRf.push_back(R[R.size() - 1]);
+    //         return QRf;
+    //     }
+    // }
+    // QRf = QR();
+    // return QRf;
+    Matrix H = householder();
+    H.printMatrix();
     vector<Matrix> QRf;
-    // Get temporary Q and R matrices and E matrix.
-    if (Q.size() == 0)
-    {
-        E.push_back(Matrix(height, width, matrix));
-    }
-    else
-    {
-        E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1], false));
-    }
-    oldE = E[E.size() - 1].getMatrix();
-    for (int i = 0; i < width; i++)
-    {
-        tempRow.push_back(0);
-    }
-    tempQ = E[E.size() - 1].getMatrix();
-    // For each column, you need to find the perpendicular component.
-    for (int i = 0; i < width; i++)
-    {
-    /*
-    Steps: 1: Dot the column with previous columns and subtract them to 
-    isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
-    basis for Q. 3: Find the new magnitude of Q and normalize it. 4: Determine value of R
-    by R=Q'A. 5: Find next value of A by A'=RQ
-    */
-        for (int j = 0; j < i; j++) // Cylces through previous columns
-        {
-            temDep = 0;
-            for (int k = 0; k < height; k++) // Find dot product with previous column
-            {
-                temDep += tempQ[k][j] * tempQ[k][i];
-            }
-            // Step 2: Subtract dependant columns
-            for (int k = 0; k < height; k++)
-            {
-                tempQ[k][i] -= temDep * tempQ[k][j];
-            }
-        }
-        // Step 3: Find new magnitude of Q and normalize
-        length = 0;
-        for (int j = 0; j < height; j++)
-        {
-            length += tempQ[j][i] * tempQ[j][i];
-        }
-        length = sqrt(length);
-        for (int j = 0; j < height; j++)
-        {
-            tempQ[j][i] /= length;
-        }
-    }
-    // Step 4: Find R by E=QR->R=Q'E
-    Q.push_back(Matrix(height, width, tempQ));
-    Matrix Qt = Q[Q.size() - 1].transpose();
-    Matrix newR = Qt.cross(E[E.size() - 1], false); 
-    R.push_back(newR); 
-    // Step 6: Cross-multiply R*Q to obtain next matrix.
-    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
-    E.push_back(newE);
-    // This section checks if the matrix has been solved within the tolerance.
-    if (E.size() > 1)
-    {
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-            }            
-        }
-        if ((error <= length * length) || (E.size() == 50))
-        {
-            QRf.clear();
-            QRf.push_back(Q[Q.size() - 1]);
-            QRf.push_back(R[R.size() - 1]);
-            return QRf;
-        }
-    }
-    QRf = QR();
     return QRf;
 }
 
-Matrix Matrix:householder()
+Matrix Matrix::householder()
 {
     vector<double> v;
     vector<vector<double> > A;
@@ -667,16 +671,16 @@ Matrix Matrix:householder()
     {
         alph = 0;
         v.clear();
-        for (int j = i + 1; j < heigth; j++)
+        for (int j = i + 1; j < height; j++)
         {
-            alph += A[j][i] * H[j][i];
+            alph += A[j][i] * A[j][i];
         }
         alph = sqrt(alph) * -1;
-        if (H[i + 1][i] < 0)
+        if (A[i + 1][i] < 0)
         {
             alph *= -1.0;
         }
-        r = sqrt(alph * alph - alph * A[i + 1][i])
+        r = sqrt(alph * alph - alph * A[i + 1][i]);
         for (int j = 0; j < height; j++)
         {
             v.push_back(0);
@@ -686,7 +690,7 @@ Matrix Matrix:householder()
         {
             v[j] = A[j][i] / (2.0 * r);
         }
-        P = H;
+        P = A;
         for (int j = 0; j < height; j++)
         {
             for (int k = 0; k <= j; k++)
