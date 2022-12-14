@@ -650,64 +650,82 @@ vector<Matrix> Matrix::QR()
     return QRf;
 }
 
-Matrix Matrix:houseHolder()
+Matrix Matrix:householder()
 {
-    vector<double> u;
-    vector<vector<double> > H;
-    vector<vector<double> > H1;
-    vector<vector<double> > R;
-    double mag;
-    H = matrix;
+    vector<double> v;
+    vector<vector<double> > A;
+    vector<vector<double> > QA;
+    vector<vector<double> > QAQ;
+    vector<vector<double> > P;
+    double alph;
+    double r;
+    double entry;
+    A = matrix;
+    QA = matrix;
+    QAQ = matrix;
     for (int i = 0; i < height - 2; i++)
     {
-        mag = 0;
-        for (int j = 0; j < hegith; j++)
+        alph = 0;
+        v.clear();
+        for (int j = i + 1; j < heigth; j++)
         {
-            u.push_back(0);
-            mag += H[j][i] * H[j][i];
+            alph += A[j][i] * H[j][i];
         }
-        mag = sqrt(mag);
-        for (int j = 0; j < heigth; j++)
+        alph = sqrt(alph) * -1;
+        if (H[i + 1][i] < 0)
         {
-            H1.push_back(u);
-            R.push_back(u)
-            H1[j][j] = 1;
+            alph *= -1.0;
         }
+        r = sqrt(alph * alph - alph * A[i + 1][i])
         for (int j = 0; j < height; j++)
         {
-            u[j] = H[j][i];
-            if(j == i)
-            {
-                u[j] -= mag;
-            }
+            v.push_back(0);
         }
-        mag = 0;
+        v[i + 1] = (A[i + 1][i] - alph) / (2 * r);
+        for (int j = i + 2; j < height; j++)
+        {
+            v[j] = A[j][i] / (2.0 * r);
+        }
+        P = H;
         for (int j = 0; j < height; j++)
         {
-            mag += u[j] * u[j];
-        }
-        mag = sqrt(mag);
-        for (int j = 0; j < height; j++)
-        {
-            for (int k = 0; k < width; k++)
+            for (int k = 0; k <= j; k++)
             {
-                H1[j][k] -= 2 * u[j] * u[k] / (mag * mag);
-            }
-        }
-        for (int j = 0; j < height; j ++)
-        {
-            for (int k = 0; k < width; k ++)
-            {
-                for (int l = 0; l < width; l++)
+                P[j][k] = v[j] * v[k] * -2.0;
+                if (j == k)
                 {
-                    R[j][k] += H1[j][k] * H[l][j];
+                    P[j][k] += 1;
+                }
+                else
+                {
+                    P[k][j] = P[j][k];
                 }
             }
         }
-
-
-        u.clear();
-        H = H1;
-        H1.clear();
+        for (int j = 0; j < width; j++)
+        {
+            for (int k = 0; k < height; k++)
+            {
+                entry = 0;
+                for (int l = 0; l < width; l++)
+                {
+                    entry += P[j][l] * A[l][k];
+                }
+                QA[k][j] = entry;
+            }
+        }
+        for (int j = 0; j < width; j++)
+        {
+            for (int k = 0; k < height; k++)
+            {
+                entry = 0;
+                for (int l = 0; l < width; l++)
+                {
+                    entry += P[j][l] * QA[l][k];
+                }
+                QAQ[k][j] = entry;
+            }
+        }
     }
+    return Matrix(height, width, QAQ, false);
 }
