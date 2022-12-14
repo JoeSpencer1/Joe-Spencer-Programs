@@ -649,3 +649,65 @@ vector<Matrix> Matrix::QR()
     QRf = QR();
     return QRf;
 }
+
+Matrix Matrix:houseHolder()
+{
+    vector<double> u;
+    vector<vector<double> > H;
+    vector<vector<double> > H1;
+    vector<vector<double> > R;
+    double mag;
+    H = matrix;
+    for (int i = 0; i < height - 2; i++)
+    {
+        mag = 0;
+        for (int j = 0; j < hegith; j++)
+        {
+            u.push_back(0);
+            mag += H[j][i] * H[j][i];
+        }
+        mag = sqrt(mag);
+        for (int j = 0; j < heigth; j++)
+        {
+            H1.push_back(u);
+            R.push_back(u)
+            H1[j][j] = 1;
+        }
+        for (int j = 0; j < height; j++)
+        {
+            u[j] = H[j][i];
+            if(j == i)
+            {
+                u[j] -= mag;
+            }
+        }
+        mag = 0;
+        for (int j = 0; j < height; j++)
+        {
+            mag += u[j] * u[j];
+        }
+        mag = sqrt(mag);
+        for (int j = 0; j < height; j++)
+        {
+            for (int k = 0; k < width; k++)
+            {
+                H1[j][k] -= 2 * u[j] * u[k] / (mag * mag);
+            }
+        }
+        for (int j = 0; j < height; j ++)
+        {
+            for (int k = 0; k < width; k ++)
+            {
+                for (int l = 0; l < width; l++)
+                {
+                    R[j][k] += H1[j][k] * H[l][j];
+                }
+            }
+        }
+
+
+        u.clear();
+        H = H1;
+        H1.clear();
+    }
+}

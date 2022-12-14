@@ -30,6 +30,7 @@ public:
     void eigenValues();
     // You still need to figure out the QR() algorithm.
     vector<Matrix> QR();
+    Matrix houseHolder();
     // The trace of the matrix is the sum of its eigenvalues
     // The determinant of the matrix is the product of its eigenvalues.
 /*void eigenVectors();*/
