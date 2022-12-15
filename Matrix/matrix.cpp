@@ -649,7 +649,16 @@ vector<Matrix> Matrix::QR()
     // QRf = QR();
     // return QRf;
     Matrix H = householder();
-    H.printMatrix();
+    int m = width - 1;
+    double sigma;
+    while(m >= 1)
+    {
+        sigma = H.getMatrix()[m][m];
+    }
+//Refer to the diagram on Github for an explanation of how to do this next part.
+
+
+H.printMatrix();
     vector<Matrix> QRf;
     return QRf;
 }
@@ -704,7 +713,6 @@ Matrix Matrix::householder()
                 }
             }
         }
-cout<<"Q:\n";for(int i = 0; i < height; i++){for(int j = 0; j < height; j++){cout<<Q[j][i]<<" ";}cout<<endl;}cout<<endl;
         for (int j = 0; j < width; j++)
         {
             for (int k = 0; k < height; k++)
@@ -729,7 +737,6 @@ cout<<"Q:\n";for(int i = 0; i < height; i++){for(int j = 0; j < height; j++){cou
                 A[j][k] = entry;
             }
         }
-cout<<"A:\n";for(int i = 0; i < height; i++){for(int j = 0; j < height; j++){cout<<A[j][i]<<" ";}cout<<endl;}cout<<endl;
     }
     return Matrix(height, width, A, false);
 }
