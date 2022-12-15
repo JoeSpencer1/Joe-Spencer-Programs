@@ -658,15 +658,14 @@ Matrix Matrix::householder()
 {
     vector<double> v;
     vector<vector<double> > A;
+    vector<vector<double> > Q;
     vector<vector<double> > QA;
-    vector<vector<double> > QAQ;
-    vector<vector<double> > P;
     double alph;
     double r;
     double entry;
     A = matrix;
+    Q = matrix;
     QA = matrix;
-    QAQ = matrix;
     for (int i = 0; i < height - 2; i++)
     {
         alph = 0;
@@ -675,12 +674,12 @@ Matrix Matrix::householder()
         {
             alph += A[j][i] * A[j][i];
         }
-        alph = sqrt(alph) * -1;
-        if (A[i + 1][i] < 0)
+        alph = sqrt(alph);
+        if (A[i + 1][i] > 0)
         {
             alph *= -1.0;
         }
-        r = sqrt(alph * alph - alph * A[i + 1][i]);
+        r = sqrt(0.5 * (alph * alph - alph * A[i + 1][i]));
         for (int j = 0; j < height; j++)
         {
             v.push_back(0);
@@ -690,20 +689,32 @@ Matrix Matrix::householder()
         {
             v[j] = A[j][i] / (2.0 * r);
         }
-        P = A;
         for (int j = 0; j < height; j++)
         {
             for (int k = 0; k <= j; k++)
             {
-                P[j][k] = v[j] * v[k] * -2.0;
+                Q[j][k] = v[j] * v[k] * -2.0;
                 if (j == k)
                 {
-                    P[j][k] += 1;
+                    Q[j][k] += 1;
                 }
                 else
                 {
-                    P[k][j] = P[j][k];
+                    Q[k][j] = Q[j][k];
                 }
+            }
+        }
+cout<<"Q:\n";for(int i = 0; i < height; i++){for(int j = 0; j < height; j++){cout<<Q[j][i]<<" ";}cout<<endl;}cout<<endl;
+        for (int j = 0; j < width; j++)
+        {
+            for (int k = 0; k < height; k++)
+            {
+                entry = 0;
+                for (int l = 0; l < width; l++)
+                {
+                    entry += Q[j][l] * A[l][k];
+                }
+                QA[j][k] = entry;
             }
         }
         for (int j = 0; j < width; j++)
@@ -713,23 +724,12 @@ Matrix Matrix::householder()
                 entry = 0;
                 for (int l = 0; l < width; l++)
                 {
-                    entry += P[j][l] * A[l][k];
+                    entry += QA[j][l] * Q[l][k];
                 }
-                QA[k][j] = entry;
+                A[j][k] = entry;
             }
         }
-        for (int j = 0; j < width; j++)
-        {
-            for (int k = 0; k < height; k++)
-            {
-                entry = 0;
-                for (int l = 0; l < width; l++)
-                {
-                    entry += P[j][l] * QA[l][k];
-                }
-                QAQ[k][j] = entry;
-            }
-        }
+cout<<"A:\n";for(int i = 0; i < height; i++){for(int j = 0; j < height; j++){cout<<A[j][i]<<" ";}cout<<endl;}cout<<endl;
     }
-    return Matrix(height, width, QAQ, false);
+    return Matrix(height, width, A, false);
 }
