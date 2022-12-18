@@ -650,24 +650,103 @@ vector<Matrix> Matrix::QR()
     // return QRf;
     Matrix Hous = householder();
     vector<vector<double> > H = Hous.getMatrix();
+    vector<vector<double> > Q;
+    vector<vector<double> > R;
+    vector<vector<double> > newH = H;
+    vector<double> tempRow;
     int row = 0;
     double sigma;
+    double temDep;
+    double length;
+    double error;
+    double magnitude;
+    for (int j = 0; j < width; j++)
+    {
+        tempRow.push_back(0);
+    }
+    for (int i = 0; i < height; i++)
+    {
+        Q.push_back(tempRow);
+        R.push_back(tempRow);   
+    }
     while(row < width)
     {
+        H = newH;
         sigma = H[row][row];
-        for (int i = 0; i < H.size(); i++)
+        for (int i = 0; i < width; i++)
         {
-            H[i][i] -= sigma;
+            newH[i][i] -= sigma;
         }
-        for (int i = 0; i < H.size(); i++)
+        for (int i = 0; i < width; i++)
         {
-            H[i][i] += sigma;
+            for (int j = 0; j < i; j++)
+            {
+                temDep = 0;
+                for (int k = 0; k < j; k++) 
+                {
+                    temDep += Q[k][j] * Q[k][i];
+                }
+                for (int k = 0; k < height; k++)
+                {
+                    Q[k][i] -= temDep * Q[k][j];
+                }
+            }
+            length = 0;
+            for (int j = 0; j < height; j++)
+            {
+                length += Q[j][i] * Q[j][i];
+            }
+            length = sqrt(length);
+            for (int j = 0; j < height; j++)
+            {
+                Q[j][i] /= length;
+            }
+        }
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                R[j][i] = 0;
+                for (int k = 0; k < width; k++)
+                {
+                    R[j][i] += Q[i][j] * newH[k][j];
+                }
+            }
+        }
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                newH[j][i] = 0;
+                for (int k = 0; k < width; k++)
+                {
+                    newH[j][i] += R[j][i] * Q[k][j];
+                }
+            }
+        }
+        for (int i = 0; i < width; i++)
+        {
+            newH[i][i] += sigma;
+        }
+        error = 0;
+        magnitude = 0;
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                error += (newH[i][j] - H[i][j]) * (newH[i][j] - H[i][j]);
+                magnitude += newH[i][j] * newH[i][j]; 
+            }
+        }
+        if (error < magnitude / 100.0)
+        {
+            row ++;
         }
     }
 //Refer to the diagram on Github for an explanation of how to do this next part.
 
-
-H.printMatrix();
+Matrix Hmat = Matrix(height, width, H);
+Hmat.printMatrix();
     vector<Matrix> QRf;
     return QRf;
 }
