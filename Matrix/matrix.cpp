@@ -648,12 +648,21 @@ vector<Matrix> Matrix::QR()
     // }
     // QRf = QR();
     // return QRf;
-    Matrix H = householder();
-    int m = width - 1;
+    Matrix Hous = householder();
+    vector<vector<double> > H = Hous.getMatrix();
+    int row = 0;
     double sigma;
-    while(m >= 1)
+    while(row < width)
     {
-        sigma = H.getMatrix()[m][m];
+        sigma = H[row][row];
+        for (int i = 0; i < H.size(); i++)
+        {
+            H[i][i] -= sigma;
+        }
+        for (int i = 0; i < H.size(); i++)
+        {
+            H[i][i] += sigma;
+        }
     }
 //Refer to the diagram on Github for an explanation of how to do this next part.
 
