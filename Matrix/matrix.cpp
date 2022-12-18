@@ -672,6 +672,8 @@ vector<Matrix> Matrix::QR()
     while(row < width)
     {
         H = newH;
+        Q = newH;
+cout<<"b\n";for(int i=0;i<width;i++){for(int j=0;j<width;j++){cout<<H[i][j]<<"\t";}cout<<"\n";}cout<<"\n";
         sigma = H[row][row];
         for (int i = 0; i < width; i++)
         {
@@ -742,6 +744,7 @@ vector<Matrix> Matrix::QR()
         {
             row ++;
         }
+cout<<"a\n";for(int i=0;i<width;i++){for(int j=0;j<width;j++){cout<<H[i][j]<<"\t";}cout<<"\n";}cout<<"\n";
     }
 //Refer to the diagram on Github for an explanation of how to do this next part.
 
