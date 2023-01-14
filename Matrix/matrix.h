@@ -31,6 +31,7 @@ public:
     // You still need to figure out the QR() algorithm.
     vector<Matrix> QR();
     Matrix householder();
+    Matrix schur();
     // The trace of the matrix is the sum of its eigenvalues
     // The determinant of the matrix is the product of its eigenvalues.
 /*void eigenVectors();*/
@@ -62,7 +63,7 @@ private:
     string name;
     int height;
     int width;
-    double size;
+    double norm;
     vector<Matrix> Q;
     vector<Matrix> R;
     vector<Matrix> E;
@@ -70,7 +71,7 @@ private:
     vector<double> imaginaryEigen;
     vector<vector<double> > eigenVectors;
     double tolerance = 0.01;
-    double accuracy = 0.00001;
+    double accuracy = 0.000001;
     vector<Matrix> matrixMenu;
     vector<int> numMenu;
     vector<double> polynomial;

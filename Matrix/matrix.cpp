@@ -25,7 +25,7 @@ Matrix::Matrix(string fileName)
     readMatrix >> width;
     checkValidity(readMatrix);
     double input;
-    size = 0;
+    norm = 0;
     vector<double> row;
     for (int i = 0; i < height; i++)
     {
@@ -35,14 +35,20 @@ Matrix::Matrix(string fileName)
             if (!readMatrix.eof())
             {
                 readMatrix >> input;
-                size += input * input;
+                if (input > 0)
+                {
+                    norm += input;
+                }
+                else
+                {
+                    norm -= input;
+                }
                 row.push_back(input);
             }
         }
         matrix.push_back(row);
         row.clear();
     }
-    size = sqrt(size);
     readMatrix.close();
     name = fileName;
     publish = true;
@@ -53,15 +59,21 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data)
     height = rows;
     width = columns;
     matrix = data;
-    size = 0;
+    norm = 0;
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            size += matrix[i][j];
+            if (matrix[i][j] > 0)
+            {
+                norm += matrix[i][j];
+            }
+            else
+            {
+                norm -= matrix[i][j];
+            }
         }
     }
-    size = sqrt(size);
     if ((rows > 0) && (columns > 0))
     {
         name = longName(generateName());
@@ -74,15 +86,21 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data, bool keep)
     height = rows;
     width = columns;
     matrix = data;
-    size = 0;
+    norm = 0;
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            size += matrix[i][j];
+            if (matrix[i][j] > 0)
+            {
+                norm += matrix[i][j];
+            }
+            else
+            {
+                norm -= matrix[i][j];
+            }
         }
     }
-    size = sqrt(size);
     publish = false;
 }
 
@@ -94,7 +112,7 @@ Matrix::Matrix()
     vector<double> tempRow;
     do
     {
-        size = 0;
+        norm = 0;
         valid = true;
         cout << "Please enter a height:\n";
         cin >> height;
@@ -113,7 +131,14 @@ Matrix::Matrix()
                 if (j == ' ')
                 {
                     tempRow.push_back(stod(strNum));
-                    size += stod(strNum) * stod(strNum);
+                    if (stod(strNum) > 0)
+                    {
+                        norm += stod(strNum);
+                    }
+                    else
+                    {
+                        norm -= stod(strNum);
+                    }
                     strNum = "";
                 }
                 else
@@ -136,7 +161,6 @@ Matrix::Matrix()
         }
     }
     while (valid == false);
-    size = sqrt(size);
     if ((height > 0) && (width > 0))
     {
         name = longName(generateName());
@@ -335,6 +359,84 @@ double Matrix::characteristic()
     }
 }
 
+Matrix Matrix::householder()
+{
+    vector<double> v;
+    vector<vector<double> > A;
+    vector<vector<double> > Q;
+    vector<vector<double> > QA;
+    double alph;
+    double r;
+    double entry;
+    A = matrix;
+    Q = matrix;
+    QA = matrix;
+    for (int i = 0; i < height - 2; i++)
+    {
+        alph = 0;
+        v.clear();
+        for (int j = i + 1; j < height; j++)
+        {
+            alph += A[j][i] * A[j][i];
+        }
+        alph = sqrt(alph);
+        if (A[i + 1][i] > 0)
+        {
+            alph *= -1.0;
+        }
+        r = sqrt(0.5 * (alph * alph - alph * A[i + 1][i]));
+        for (int j = 0; j < height; j++)
+        {
+            v.push_back(0);
+        }
+        v[i + 1] = (A[i + 1][i] - alph) / (2 * r);
+        for (int j = i + 2; j < height; j++)
+        {
+            v[j] = A[j][i] / (2.0 * r);
+        }
+        for (int j = 0; j < height; j++)
+        {
+            for (int k = 0; k <= j; k++)
+            {
+                Q[j][k] = v[j] * v[k] * -2.0;
+                if (j == k)
+                {
+                    Q[j][k] += 1;
+                }
+                else
+                {
+                    Q[k][j] = Q[j][k];
+                }
+            }
+        }
+        for (int j = 0; j < width; j++)
+        {
+            for (int k = 0; k < height; k++)
+            {
+                entry = 0;
+                for (int l = 0; l < width; l++)
+                {
+                    entry += Q[j][l] * A[l][k];
+                }
+                QA[j][k] = entry;
+            }
+        }
+        for (int j = 0; j < width; j++)
+        {
+            for (int k = 0; k < height; k++)
+            {
+                entry = 0;
+                for (int l = 0; l < width; l++)
+                {
+                    entry += QA[j][l] * Q[l][k];
+                }
+                A[j][k] = entry;
+            }
+        }
+    }
+    return Matrix(height, width, A, false);
+}
+
 Matrix Matrix::invert()
 {
     double scale;
@@ -412,7 +514,6 @@ Matrix Matrix::invert()
             }
         }
         publish = Matrix(inverse.size(), inverse[0].size(), inverse);
-        cout << "Inverse published as " << publish.getName();
     }
     solve.clear();
     row.clear();
@@ -433,7 +534,6 @@ Matrix Matrix::transpose()
         }
     }
     Matrix publish = Matrix(transpose.size(), transpose[0].size(), transpose);
-    cout << "Transpose published as " << publish.getName();
     return publish;
 }
 
@@ -562,272 +662,101 @@ void Matrix::eigenValues()
 
 vector<Matrix> Matrix::QR()
 {
-    // double length = 0;
-    // double inDep = 0;
-    // double temDep = 0;
-    // double dotProduct = 0;
-    // double error = 0;
-    // vector<vector<double> > tempQ;
-    // vector<vector<double> > oldE;
-    // vector<double> lengths;
-    // vector<double> tempRow;
-    // vector<Matrix> QRf;
-    // // Get temporary Q and R matrices and E matrix.
-    // if (Q.size() == 0)
-    // {
-    //     E.push_back(Matrix(height, width, matrix));
-    // }
-    // else
-    // {
-    //     E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1], false));
-    // }
-    // oldE = E[E.size() - 1].getMatrix();
-    // for (int i = 0; i < width; i++)
-    // {
-    //     tempRow.push_back(0);
-    // }
-    // tempQ = E[E.size() - 1].getMatrix();
-    // // For each column, you need to find the perpendicular component.
-    // for (int i = 0; i < width; i++)
-    // {
-    // /*
-    // Steps: 1: Dot the column with previous columns and subtract them to 
-    // isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
-    // basis for Q. 3: Find the new magnitude of Q and normalize it. 4: Determine value of R
-    // by R=Q'A. 5: Find next value of A by A'=RQ
-    // */
-    //     for (int j = 0; j < i; j++) // Cylces through previous columns
-    //     {
-    //         temDep = 0;
-    //         for (int k = 0; k < height; k++) // Find dot product with previous column
-    //         {
-    //             temDep += tempQ[k][j] * tempQ[k][i];
-    //         }
-    //         // Step 2: Subtract dependant columns
-    //         for (int k = 0; k < height; k++)
-    //         {
-    //             tempQ[k][i] -= temDep * tempQ[k][j];
-    //         }
-    //     }
-    //     // Step 3: Find new magnitude of Q and normalize
-    //     length = 0;
-    //     for (int j = 0; j < height; j++)
-    //     {
-    //         length += tempQ[j][i] * tempQ[j][i];
-    //     }
-    //     length = sqrt(length);
-    //     for (int j = 0; j < height; j++)
-    //     {
-    //         tempQ[j][i] /= length;
-    //     }
-    // }
-    // // Step 4: Find R by E=QR->R=Q'E
-    // Q.push_back(Matrix(height, width, tempQ));
-    // Matrix Qt = Q[Q.size() - 1].transpose();
-    // Matrix newR = Qt.cross(E[E.size() - 1], false); 
-    // R.push_back(newR); 
-    // // Step 6: Cross-multiply R*Q to obtain next matrix.
-    // Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
-    // E.push_back(newE);
-    // // This section checks if the matrix has been solved within the tolerance.
-    // if (E.size() > 1)
-    // {
-    //     for (int i = 0; i < width; i++)
-    //     {
-    //         for (int j = 0; j < width; j++)
-    //         {
-    //         }            
-    //     }
-    //     if ((error <= length * length) || (E.size() == 50))
-    //     {
-    //         QRf.clear();
-    //         QRf.push_back(Q[Q.size() - 1]);
-    //         QRf.push_back(R[R.size() - 1]);
-    //         return QRf;
-    //     }
-    // }
-    // QRf = QR();
-    // return QRf;
-    Matrix Hous = householder();
-    vector<vector<double> > H = Hous.getMatrix();
-    vector<vector<double> > Q;
-    vector<vector<double> > R;
-    vector<vector<double> > newH = H;
+    double length = 0;
+    double inDep = 0;
+    double temDep = 0;
+    double dotProduct = 0;
+    double error = 0;
+    vector<vector<double> > tempQ;
+    vector<vector<double> > oldE;
+    vector<double> lengths;
     vector<double> tempRow;
-    int row = 0;
-    double sigma;
-    double temDep;
-    double length;
-    double error;
-    double magnitude;
-    for (int j = 0; j < width; j++)
+    vector<Matrix> QRf;
+    // Get temporary Q and R matrices and E matrix.
+    if (Q.size() == 0)
+    {
+        E.push_back(Matrix(height, width, matrix));
+    }
+    else
+    {
+        E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1], false));
+    }
+    oldE = E[E.size() - 1].getMatrix();
+    for (int i = 0; i < width; i++)
     {
         tempRow.push_back(0);
     }
-    for (int i = 0; i < height; i++)
+    tempQ = E[E.size() - 1].getMatrix();
+    // For each column, you need to find the perpendicular component.
+    for (int i = 0; i < width; i++)
     {
-        Q.push_back(tempRow);
-        R.push_back(tempRow);   
+    /*
+    Steps: 1: Dot the column with previous columns and subtract them to 
+    isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
+    basis for Q. 3: Find the new magnitude of Q and normalize it. 4: Determine value of R
+    by R=Q'A. 5: Find next value of A by A'=RQ
+    */
+        for (int j = 0; j < i; j++) // Cylces through previous columns
+        {
+            temDep = 0;
+            for (int k = 0; k < height; k++) // Find dot product with previous column
+            {
+                temDep += tempQ[k][j] * tempQ[k][i];
+            }
+            // Step 2: Subtract dependant columns
+            for (int k = 0; k < height; k++)
+            {
+                tempQ[k][i] -= temDep * tempQ[k][j];
+            }
+        }
+        // Step 3: Find new magnitude of Q and normalize
+        length = 0;
+        for (int j = 0; j < height; j++)
+        {
+            length += tempQ[j][i] * tempQ[j][i];
+        }
+        length = sqrt(length);
+        for (int j = 0; j < height; j++)
+        {
+            tempQ[j][i] /= length;
+        }
     }
-    while(row < width)
+    // Step 4: Find R by E=QR->R=Q'E
+    Q.push_back(Matrix(height, width, tempQ));
+    Matrix Qt = Q[Q.size() - 1].transpose();
+    Matrix newR = Qt.cross(E[E.size() - 1], false); 
+    R.push_back(newR); 
+    // Step 6: Cross-multiply R*Q to obtain next matrix.
+    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
+    E.push_back(newE);
+    // This section checks if the matrix has been solved within the tolerance.
+    if (E.size() > 1)
     {
-        H = newH;
-        Q = newH;
-cout<<"b\n";for(int i=0;i<width;i++){for(int j=0;j<width;j++){cout<<H[i][j]<<"\t";}cout<<"\n";}cout<<"\n";
-        sigma = H[row][row];
         for (int i = 0; i < width; i++)
         {
-            newH[i][i] -= sigma;
+            error += (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]) * (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]); 
         }
-        for (int i = 0; i < width; i++)
+        if (error < accuracy * height)
         {
-            for (int j = 0; j < i; j++)
-            {
-                temDep = 0;
-                for (int k = 0; k < j; k++) 
-                {
-                    temDep += Q[k][j] * Q[k][i];
-                }
-                for (int k = 0; k < height; k++)
-                {
-                    Q[k][i] -= temDep * Q[k][j];
-                }
-            }
-            length = 0;
-            for (int j = 0; j < height; j++)
-            {
-                length += Q[j][i] * Q[j][i];
-            }
-            length = sqrt(length);
-            for (int j = 0; j < height; j++)
-            {
-                Q[j][i] /= length;
-            }
+            QRf.clear();
+            QRf.push_back(Q[Q.size() - 1]);
+            QRf.push_back(R[R.size() - 1]);
+            return QRf;
         }
-        for (int i = 0; i < width; i++)
+        else
         {
-            for (int j = 0; j < height; j++)
-            {
-                R[j][i] = 0;
-                for (int k = 0; k < width; k++)
-                {
-                    R[j][i] += Q[i][j] * newH[k][j];
-                }
-            }
+            QRf = QR();
         }
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                newH[j][i] = 0;
-                for (int k = 0; k < width; k++)
-                {
-                    newH[j][i] += R[j][i] * Q[k][j];
-                }
-            }
-        }
-        for (int i = 0; i < width; i++)
-        {
-            newH[i][i] += sigma;
-        }
-        error = 0;
-        magnitude = 0;
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                error += (newH[i][j] - H[i][j]) * (newH[i][j] - H[i][j]);
-                magnitude += newH[i][j] * newH[i][j]; 
-            }
-        }
-        if (error < magnitude / 100.0)
-        {
-            row ++;
-        }
-cout<<"a\n";for(int i=0;i<width;i++){for(int j=0;j<width;j++){cout<<H[i][j]<<"\t";}cout<<"\n";}cout<<"\n";
     }
-//Refer to the diagram on Github for an explanation of how to do this next part.
-
-Matrix Hmat = Matrix(height, width, H);
-Hmat.printMatrix();
-    vector<Matrix> QRf;
+Q[Q.size() - 1].printMatrix();
+R[R.size() - 1].printMatrix();
+    QRf = QR();
     return QRf;
 }
 
-Matrix Matrix::householder()
+Matrix Matrix::schur()
 {
-    vector<double> v;
-    vector<vector<double> > A;
-    vector<vector<double> > Q;
-    vector<vector<double> > QA;
-    double alph;
-    double r;
-    double entry;
-    A = matrix;
-    Q = matrix;
-    QA = matrix;
-    for (int i = 0; i < height - 2; i++)
-    {
-        alph = 0;
-        v.clear();
-        for (int j = i + 1; j < height; j++)
-        {
-            alph += A[j][i] * A[j][i];
-        }
-        alph = sqrt(alph);
-        if (A[i + 1][i] > 0)
-        {
-            alph *= -1.0;
-        }
-        r = sqrt(0.5 * (alph * alph - alph * A[i + 1][i]));
-        for (int j = 0; j < height; j++)
-        {
-            v.push_back(0);
-        }
-        v[i + 1] = (A[i + 1][i] - alph) / (2 * r);
-        for (int j = i + 2; j < height; j++)
-        {
-            v[j] = A[j][i] / (2.0 * r);
-        }
-        for (int j = 0; j < height; j++)
-        {
-            for (int k = 0; k <= j; k++)
-            {
-                Q[j][k] = v[j] * v[k] * -2.0;
-                if (j == k)
-                {
-                    Q[j][k] += 1;
-                }
-                else
-                {
-                    Q[k][j] = Q[j][k];
-                }
-            }
-        }
-        for (int j = 0; j < width; j++)
-        {
-            for (int k = 0; k < height; k++)
-            {
-                entry = 0;
-                for (int l = 0; l < width; l++)
-                {
-                    entry += Q[j][l] * A[l][k];
-                }
-                QA[j][k] = entry;
-            }
-        }
-        for (int j = 0; j < width; j++)
-        {
-            for (int k = 0; k < height; k++)
-            {
-                entry = 0;
-                for (int l = 0; l < width; l++)
-                {
-                    entry += QA[j][l] * Q[l][k];
-                }
-                A[j][k] = entry;
-            }
-        }
-    }
-    return Matrix(height, width, A, false);
+    vector<double> tempRow;
+    vector<vector<double> > tempMatrix;
+    return Matrix();
 }
