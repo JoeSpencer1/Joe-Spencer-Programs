@@ -175,6 +175,14 @@ Matrix::~Matrix()
     {
         publishFile();
     }
+    matrix.clear();
+    Q.clear();
+    R.clear();
+    E.clear();
+    realEigen.clear();
+    imaginaryEigen.clear();
+    eigenVectors.clear();
+    matrixMenu.clear();
 };
 
 Matrix Matrix::add(Matrix Other)
@@ -672,7 +680,7 @@ vector<Matrix> Matrix::QR(int n)
     vector<double> lengths;
     vector<double> tempRow;
     vector<Matrix> QRf;
-vector<Matrix> muvec;
+    vector<Matrix> muvec;
     // Get temporary Q and R matrices and E matrix.
     if (Q.size() == 0)
     {
@@ -688,18 +696,17 @@ vector<Matrix> muvec;
         tempRow.push_back(0);
     }
     tempQ = E[E.size() - 1].getMatrix();
-if (((tempQ[n + 1][n] > accuracy) || (tempQ[n + 1][n] < (0 - accuracy))) && (((tempQ[n + 1][n] - tempQ[n][n + 1]) < accuracy) && ((tempQ[n + 1][n] - tempQ[n][n + 1]) > 0 - accuracy)))
-{
-    Matrix mu = wilkinson(tempQ[n][n], tempQ[n + 1][n], tempQ[n + 1][n + 1]);
-    muvec.push_back(mu);
-}
-else
-{
-    Matrix mu = identity(tempQ[n][n]);
-    muvec.push_back(mu);
-}
-//muvec[muvec.size() - 1].printMatrix();
-tempQ = (E[E.size() - 1].subtract(muvec[muvec.size() - 1])).getMatrix();
+    if (((tempQ[n + 1][n] > accuracy) || (tempQ[n + 1][n] < (0 - accuracy))) && (((tempQ[n + 1][n] - tempQ[n][n + 1]) < accuracy) && ((tempQ[n + 1][n] - tempQ[n][n + 1]) > 0 - accuracy)))
+    {
+        Matrix mu = wilkinson(tempQ[n][n], tempQ[n + 1][n], tempQ[n + 1][n + 1]);
+        muvec.push_back(mu);
+    }
+    else
+    {
+        Matrix mu = identity(tempQ[n][n]);
+        muvec.push_back(mu);
+    }
+    tempQ = (E[E.size() - 1].subtract(muvec[muvec.size() - 1])).getMatrix();
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
@@ -740,24 +747,21 @@ tempQ = (E[E.size() - 1].subtract(muvec[muvec.size() - 1])).getMatrix();
     Matrix newR = Qt.cross(E[E.size() - 1], false); 
     R.push_back(newR); 
     // Step 6: Cross-multiply R*Q to obtain next matrix.
-Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false).add(muvec[muvec.size() - 1]);
-/*cout<<"Q"<<endl;
-Q[Q.size() - 1].printMatrix();*/
+    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false).add(muvec[muvec.size() - 1]);
 cout<<"R"<<endl;
 R[R.size() - 1].printMatrix();
-/*cout<<"E"<<endl;
-newE.printMatrix();
-*///Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
     E.push_back(newE);
     // This section checks if the matrix has been solved within the tolerance.
     if (E.size() > 1)
     {
         for (int i = 0; i < width; i++)
         {
-            error += (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]) * (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]);
+            for (int j = 0; j < width; j++)
+            {
+                error += (E[E.size() - 1].getMatrix()[i][j] - E[E.size() - 2].getMatrix()[i][j]) * (E[E.size() - 1].getMatrix()[i][j] - E[E.size() - 2].getMatrix()[i][j]);
+            }
         }
-//cout << error << " "; 
-        if (error < accuracy * determinant())
+        if (error < accuracy)
         {
             n--;
             if (n == width - 1)

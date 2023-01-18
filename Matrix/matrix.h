@@ -39,7 +39,6 @@ public:
     // These are more of overhead functions for the program.
     void menu();
     void publishFile();
-    vector<double> createPolynomial();
     bool checkCompatibility(Matrix Other);
     int vectorPosition(vector<Matrix> matrixMenu, vector<int> numMenu);
     void checkValidity(ifstream & readMatrix);
