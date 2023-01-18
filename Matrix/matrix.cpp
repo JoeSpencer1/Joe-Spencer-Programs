@@ -650,7 +650,7 @@ double Matrix::trace()
 
 void Matrix::eigenValues()
 {
-    vector<Matrix> QRf = QR();
+    vector<Matrix> QRf = QR(height - 1);
     Matrix Q = QRf[0];
     Matrix R = QRf[1];
     cout << "R:\n";
@@ -660,7 +660,7 @@ void Matrix::eigenValues()
     return;
 }
 
-vector<Matrix> Matrix::QR()
+vector<Matrix> Matrix::QR(int n)
 {
     double length = 0;
     double inDep = 0;
@@ -672,6 +672,7 @@ vector<Matrix> Matrix::QR()
     vector<double> lengths;
     vector<double> tempRow;
     vector<Matrix> QRf;
+vector<Matrix> muvec;
     // Get temporary Q and R matrices and E matrix.
     if (Q.size() == 0)
     {
@@ -687,6 +688,18 @@ vector<Matrix> Matrix::QR()
         tempRow.push_back(0);
     }
     tempQ = E[E.size() - 1].getMatrix();
+if (((tempQ[n + 1][n] > accuracy) || (tempQ[n + 1][n] < (0 - accuracy))) && (((tempQ[n + 1][n] - tempQ[n][n + 1]) < accuracy) && ((tempQ[n + 1][n] - tempQ[n][n + 1]) > 0 - accuracy)))
+{
+    Matrix mu = wilkinson(tempQ[n][n], tempQ[n + 1][n], tempQ[n + 1][n + 1]);
+    muvec.push_back(mu);
+}
+else
+{
+    Matrix mu = identity(tempQ[n][n]);
+    muvec.push_back(mu);
+}
+//muvec[muvec.size() - 1].printMatrix();
+tempQ = (E[E.size() - 1].subtract(muvec[muvec.size() - 1])).getMatrix();
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
@@ -727,36 +740,72 @@ vector<Matrix> Matrix::QR()
     Matrix newR = Qt.cross(E[E.size() - 1], false); 
     R.push_back(newR); 
     // Step 6: Cross-multiply R*Q to obtain next matrix.
-    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
+Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false).add(muvec[muvec.size() - 1]);
+/*cout<<"Q"<<endl;
+Q[Q.size() - 1].printMatrix();*/
+cout<<"R"<<endl;
+R[R.size() - 1].printMatrix();
+/*cout<<"E"<<endl;
+newE.printMatrix();
+*///Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
     E.push_back(newE);
     // This section checks if the matrix has been solved within the tolerance.
     if (E.size() > 1)
     {
         for (int i = 0; i < width; i++)
         {
-            error += (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]) * (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]); 
+            error += (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]) * (E[E.size() - 1].getMatrix()[i][i] - E[E.size() - 2].getMatrix()[i][i]);
         }
-        if (error < accuracy * height)
+//cout << error << " "; 
+        if (error < accuracy * determinant())
         {
-            QRf.clear();
-            QRf.push_back(Q[Q.size() - 1]);
-            QRf.push_back(R[R.size() - 1]);
-            return QRf;
+            n--;
+            if (n == width - 1)
+            {
+                QRf.clear();
+                QRf.push_back(Q[Q.size() - 1]);
+                QRf.push_back(R[R.size() - 1]);
+                E.clear();
+                Q.clear();
+                R.clear();
+                return QRf;
+            }
         }
-        else
-        {
-            QRf = QR();
-        }
+        QRf = QR(n);
     }
-Q[Q.size() - 1].printMatrix();
-R[R.size() - 1].printMatrix();
-    QRf = QR();
+    QRf = QR(n);
+    muvec.clear();
     return QRf;
 }
 
-Matrix Matrix::schur()
+Matrix Matrix::wilkinson(double a, double b, double c)
+{
+    double delta = (a - c) / 2.0;
+    double sign = 1.0;
+    if (delta < 0)
+    {
+        sign = -1.0;
+    }
+    double mu = c - sign * b * b / (delta * sign + sqrt(delta * delta + b * b));
+    return identity(mu);
+}
+
+Matrix Matrix::identity(double factor)
 {
     vector<double> tempRow;
     vector<vector<double> > tempMatrix;
-    return Matrix();
+    for (int i = 0; i < width; i++)
+    {
+        tempRow.push_back(0.0);
+    }
+    for (int i = 0; i < height; i++)
+    {
+        tempMatrix.push_back(tempRow);
+    }
+    for (int i = 0; i < height; i++)
+    {
+        tempMatrix[i][i] = factor;
+    }
+    Matrix ident = Matrix(height, width, tempMatrix, false);
+    return ident;
 }

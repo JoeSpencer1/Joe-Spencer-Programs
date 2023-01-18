@@ -29,9 +29,10 @@ public:
     double trace();
     void eigenValues();
     // You still need to figure out the QR() algorithm.
-    vector<Matrix> QR();
+    vector<Matrix> QR(int n);
     Matrix householder();
-    Matrix schur();
+    Matrix wilkinson(double a, double b, double c);
+    Matrix identity(double factor);
     // The trace of the matrix is the sum of its eigenvalues
     // The determinant of the matrix is the product of its eigenvalues.
 /*void eigenVectors();*/
