@@ -10,13 +10,23 @@ using namespace std;
 Matrix::Matrix(string fileName)
 {
     // This segment reads in the matrix from a file. The matrix is written with its height first, then width, then the data.
-    fileName = longName(fileName);
+    if ((fileName[0] != 'M') || (fileName[1] != 'a') || (fileName[2] != 't') || (fileName[3] != 'r') || (fileName[4] != 'i')
+        || (fileName[5] != 'c') || (fileName[6] != 'e') || (fileName[7] != 's') || (fileName[8] != '/'))
+    {
+        fileName = longName(fileName);
+    }
+    if ((fileName[fileName.length() - 1] != 't') || (fileName[fileName.length() - 2] != 'x') 
+        || (fileName[fileName.length() - 3] != 't') || (fileName[fileName.length() - 4] != '.'))
+    {
+        fileName = longName(fileName);
+    }
     ifstream readMatrix(fileName);
     while (!readMatrix.is_open())
-    {
+    {   
         cout << "Please enter the name of a matrix file contained in this folder.\n";
         cin >> fileName;
         fileName = longName(fileName);
+        fileName = fileName;
         readMatrix.open(fileName);
     }
     checkValidity(readMatrix);
@@ -676,11 +686,11 @@ vector<Matrix> Matrix::QR(int n)
     double dotProduct = 0;
     double error = 0;
     vector<vector<double> > tempQ;
-    vector<vector<double> > oldE;
-    vector<double> lengths;
-    vector<double> tempRow;
+//vector<vector<double> > oldE;
+//vector<double> lengths;
+//vector<double> tempRow;
     vector<Matrix> QRf;
-    vector<Matrix> muvec;
+    Matrix muvec = Matrix(0, 0, tempQ);
     // Get temporary Q and R matrices and E matrix.
     if (Q.size() == 0)
     {
@@ -690,23 +700,23 @@ vector<Matrix> Matrix::QR(int n)
     {
         E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1], false));
     }
-    oldE = E[E.size() - 1].getMatrix();
-    for (int i = 0; i < width; i++)
-    {
-        tempRow.push_back(0);
-    }
+//oldE = E[E.size() - 1].getMatrix();
+//for (int i = 0; i < width; i++)
+//{
+//    tempRow.push_back(0);
+//}
     tempQ = E[E.size() - 1].getMatrix();
     if (((tempQ[n + 1][n] > accuracy) || (tempQ[n + 1][n] < (0 - accuracy))) && (((tempQ[n + 1][n] - tempQ[n][n + 1]) < accuracy) && ((tempQ[n + 1][n] - tempQ[n][n + 1]) > 0 - accuracy)))
     {
         Matrix mu = wilkinson(tempQ[n][n], tempQ[n + 1][n], tempQ[n + 1][n + 1]);
-        muvec.push_back(mu);
+        muvec = mu;
     }
     else
     {
         Matrix mu = identity(tempQ[n][n]);
-        muvec.push_back(mu);
+        muvec = mu;
     }
-    tempQ = (E[E.size() - 1].subtract(muvec[muvec.size() - 1])).getMatrix();
+    tempQ = (E[E.size() - 1].subtract(muvec)).getMatrix();
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
@@ -743,15 +753,24 @@ vector<Matrix> Matrix::QR(int n)
     }
     // Step 4: Find R by E=QR->R=Q'E
     Q.push_back(Matrix(height, width, tempQ));
+    tempQ.clear();
     Matrix Qt = Q[Q.size() - 1].transpose();
     Matrix newR = Qt.cross(E[E.size() - 1], false); 
     R.push_back(newR); 
     // Step 6: Cross-multiply R*Q to obtain next matrix.
-    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false).add(muvec[muvec.size() - 1]);
+    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false).add(muvec);
+    muvec.~Matrix();
 cout<<"R"<<endl;
 R[R.size() - 1].printMatrix();
+cout<<"Q"<<endl;
+Q[Q.size() - 1].printMatrix();
     E.push_back(newE);
     // This section checks if the matrix has been solved within the tolerance.
+    for (int i = 0; i < height; i++)
+    {
+        tempQ[i].clear();
+    }
+    tempQ.clear();
     if (E.size() > 1)
     {
         for (int i = 0; i < width; i++)
@@ -764,6 +783,7 @@ R[R.size() - 1].printMatrix();
         if (error < accuracy)
         {
             n--;
+cout << n << endl;
             if (n == width - 1)
             {
                 QRf.clear();
@@ -775,41 +795,7 @@ R[R.size() - 1].printMatrix();
                 return QRf;
             }
         }
-        QRf = QR(n);
     }
     QRf = QR(n);
-    muvec.clear();
     return QRf;
-}
-
-Matrix Matrix::wilkinson(double a, double b, double c)
-{
-    double delta = (a - c) / 2.0;
-    double sign = 1.0;
-    if (delta < 0)
-    {
-        sign = -1.0;
-    }
-    double mu = c - sign * b * b / (delta * sign + sqrt(delta * delta + b * b));
-    return identity(mu);
-}
-
-Matrix Matrix::identity(double factor)
-{
-    vector<double> tempRow;
-    vector<vector<double> > tempMatrix;
-    for (int i = 0; i < width; i++)
-    {
-        tempRow.push_back(0.0);
-    }
-    for (int i = 0; i < height; i++)
-    {
-        tempMatrix.push_back(tempRow);
-    }
-    for (int i = 0; i < height; i++)
-    {
-        tempMatrix[i][i] = factor;
-    }
-    Matrix ident = Matrix(height, width, tempMatrix, false);
-    return ident;
 }
