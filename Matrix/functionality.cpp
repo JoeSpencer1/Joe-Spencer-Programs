@@ -561,7 +561,7 @@ string Matrix::longName(string shortName)
     return newName;
 }
 
-Matrix Matrix::wilkinson(double a, double b, double c)
+vector<vector<double> > Matrix::wilkinson(double a, double b, double c)
 {
     double delta = (a - c) / 2.0;
     double sign = 1.0;
@@ -573,7 +573,7 @@ Matrix Matrix::wilkinson(double a, double b, double c)
     return identity(mu);
 }
 
-Matrix Matrix::identity(double factor)
+vector<vector<double> > Matrix::identity(double factor)
 {
     vector<double> tempRow;
     vector<vector<double> > tempMatrix;
@@ -589,6 +589,5 @@ Matrix Matrix::identity(double factor)
     {
         tempMatrix[i][i] = factor;
     }
-    Matrix ident = Matrix(height, width, tempMatrix, false);
-    return ident;
+    return tempMatrix;
 }
