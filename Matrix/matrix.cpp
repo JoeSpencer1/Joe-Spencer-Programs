@@ -708,16 +708,17 @@ vector<Matrix> Matrix::QR(int n, Matrix Ea)
 //
 //    tempQ = E[E.size() - 1].getMatrix();
     tempQ = Ea.getMatrix();
-Ea.printMatrix();
+//Ea.printMatrix();
     if (((tempQ[n - 1][n] > accuracy) || (tempQ[n - 1][n] < (0 - accuracy))) && (((tempQ[n - 1][n] - tempQ[n][n - 1]) < accuracy) && ((tempQ[n - 1][n] - tempQ[n][n - 1]) > 0 - accuracy)))
     {
-        mu = wilkinson(tempQ[n - 1][n - 1], tempQ[n][n], tempQ[n][n]);
+        mu = wilkinson(tempQ[n - 1][n - 1], tempQ[n - 1][n], tempQ[n][n]);
     }
     else
     {
         mu = identity(tempQ[n][n]);
     }
     Matrix muvec = Matrix(height, width, mu);
+    mu.clear();
 //
 //    Matrix tQ = E[E.size() - 1].subtract(muvec);
     Matrix tQ = Ea.subtract(muvec);
@@ -820,6 +821,13 @@ Q[Q.size() - 1].printMatrix();
             }
         }
 //    }
+cout<<"E:\n";
+Ea.printMatrix();
+cout<<"Q:\n";
+Qa.printMatrix();
+cout<<"R:\n";
+Ra.printMatrix();
+cout<<"newE:\n";
     Ea.~Matrix();
     Qa.~Matrix();
     Ra.~Matrix();
