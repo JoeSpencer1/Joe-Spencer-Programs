@@ -186,9 +186,9 @@ Matrix::~Matrix()
         publishFile();
     }
     matrix.clear();
-    Q.clear();
+/*    Q.clear();
     R.clear();
-    E.clear();
+    E.clear();*/
     realEigen.clear();
     imaginaryEigen.clear();
     eigenVectors.clear();
@@ -668,7 +668,8 @@ double Matrix::trace()
 
 void Matrix::eigenValues()
 {
-    vector<Matrix> QRf = QR(height - 1);
+    Matrix A = Matrix(height, width, matrix);
+    vector<Matrix> QRf = QR(height - 1, A);
     Matrix Q = QRf[0];
     Matrix R = QRf[1];
     cout << "R:\n";
@@ -678,34 +679,36 @@ void Matrix::eigenValues()
     return;
 }
 
-vector<Matrix> Matrix::QR(int n)
+vector<Matrix> Matrix::QR(int n, Matrix Ea)
 {
     double length = 0;
-    double inDep = 0;
     double temDep = 0;
-    double dotProduct = 0;
     double error = 0;
     vector<vector<double> > tempQ;
     vector<vector<double> > mu;
-    vector<Matrix> QRf;
+//    vector<Matrix> QRf;
     // Get temporary Q and R matrices and E matrix.
-    if (Q.size() == 0)
+/*    if (Q.size() == 0)
     {
         Matrix temE = Matrix(height, width, matrix);
         Ea = &temE;
+
 //
 //        E.push_back(Matrix(height, width, matrix));
     }
     else
     {
-        Matrix temE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
-        Ea = &temE;
+        */
+//        Matrix temE = R[R.size() - 1].cross(Q[Q.size() - 1], false);
+//        Ea = &temE;
+    //Ea = Ra.cross(Qa);
 //
 //        E.push_back(R[R.size() - 1].cross(Q[Q.size() - 1], false));
-    }
+/*    }*/
 //
 //    tempQ = E[E.size() - 1].getMatrix();
-    tempQ = Ea->getMatrix();
+    tempQ = Ea.getMatrix();
+Ea.printMatrix();
     if (((tempQ[n - 1][n] > accuracy) || (tempQ[n - 1][n] < (0 - accuracy))) && (((tempQ[n - 1][n] - tempQ[n][n - 1]) < accuracy) && ((tempQ[n - 1][n] - tempQ[n][n - 1]) > 0 - accuracy)))
     {
         mu = wilkinson(tempQ[n - 1][n - 1], tempQ[n][n], tempQ[n][n]);
@@ -717,7 +720,7 @@ vector<Matrix> Matrix::QR(int n)
     Matrix muvec = Matrix(height, width, mu);
 //
 //    Matrix tQ = E[E.size() - 1].subtract(muvec);
-    Matrix tQ = Ea->subtract(muvec);
+    Matrix tQ = Ea.subtract(muvec);
     tempQ = tQ.getMatrix();
     tQ.~Matrix();
     // For each column, you need to find the perpendicular component.
@@ -757,32 +760,33 @@ vector<Matrix> Matrix::QR(int n)
     // Step 4: Find R by E=QR->R=Q'E
 //
 //    Q.push_back(Matrix(height, width, tempQ));
-    Matrix temQ = Matrix(height, width, tempQ);
-    Qa  = &temQ;
+    Matrix Qa = Matrix(height, width, tempQ);
+//    Qa  = temQ;
 //    tempQ.clear();
 //    Matrix Qt = Q[Q.size() - 1].transpose();
-    Matrix Qt = Qa->transpose();
-    Matrix newR = Qt.cross(E[E.size() - 1], false);
+    Matrix Qt = Qa.transpose();
+    Matrix Ra = Qt.cross(Ea, false);
     Qt.~Matrix(); 
 //
 //    R.push_back(newR);
-    Ra = &newR;
+//    Ra = &newR;
 //    newR.~Matrix();
     // Step 6: Cross-multiply R*Q to obtain next matrix.
 //    Matrix newE = R[R.size() - 1].cross(Q[Q.size() - 1], false).add(muvec);
-    Matrix newE = Ra->cross(*Qa , false).add(muvec);
+    Matrix Eb = Ra.cross(Qa , false).add(muvec);
     muvec.~Matrix();
 //
 //
+/*
 cout<<"R"<<endl;
 R[R.size() - 1].printMatrix();
 cout<<"Q"<<endl;
 Q[Q.size() - 1].printMatrix();
-//
+//*/
 //
 //
 //    E.push_back(newE);
-    Eb = &newE;
+//    Eb = &newE;
 //    newE.~Matrix();
     // This section checks if the matrix has been solved within the tolerance.
     for (int i = 0; i < height; i++)
@@ -796,7 +800,7 @@ Q[Q.size() - 1].printMatrix();
         {
             for (int j = 0; j < width; j++)
             {
-                error += (Eb->getMatrix()[i][j] - Ea->getMatrix()[i][j]) * (Eb->getMatrix()[i][j] - Ea->getMatrix()[i][j]);
+                error += (Eb.getMatrix()[i][j] - Ea.getMatrix()[i][j]) * (Eb.getMatrix()[i][j] - Ea.getMatrix()[i][j]);
 //
 //                error += (E[E.size() - 1].getMatrix()[i][j] - E[E.size() - 2].getMatrix()[i][j]) * (E[E.size() - 1].getMatrix()[i][j] - E[E.size() - 2].getMatrix()[i][j]);
             }
@@ -807,15 +811,18 @@ Q[Q.size() - 1].printMatrix();
             if (n == width - 1)
             {
                 QRf.clear();
-QRf.push_back(Q[Q.size() - 1]);
-QRf.push_back(R[R.size() - 1]);
-E.clear();
-Q.clear();
-R.clear();
+//QRf.push_back(Q[Q.size() - 1]);
+//QRf.push_back(R[R.size() - 1]);
+//E.clear();
+//Q.clear();
+//R.clear();
                 return QRf;
             }
         }
 //    }
-    QRf = QR(n);
+    Ea.~Matrix();
+    Qa.~Matrix();
+    Ra.~Matrix();
+    QRf = QR(n, Eb);
     return QRf;
 }
