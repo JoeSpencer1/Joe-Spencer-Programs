@@ -719,6 +719,7 @@ vector<Matrix> Matrix::QR(int n, Matrix Ea)
     }
     Matrix muvec = Matrix(height, width, mu);
     mu.clear();
+    tempQ.clear();
 //
 //    Matrix tQ = E[E.size() - 1].subtract(muvec);
     Matrix tQ = Ea.subtract(muvec);
@@ -766,7 +767,8 @@ vector<Matrix> Matrix::QR(int n, Matrix Ea)
 //    tempQ.clear();
 //    Matrix Qt = Q[Q.size() - 1].transpose();
     Matrix Qt = Qa.transpose();
-    Matrix Ra = Qt.cross(Ea, false);
+Matrix Et = Ea.subtract(muvec);
+    Matrix Ra = Qt.cross(Et, false);
     Qt.~Matrix(); 
 //
 //    R.push_back(newR);
@@ -821,13 +823,14 @@ Q[Q.size() - 1].printMatrix();
             }
         }
 //    }
-cout<<"E:\n";
+/*cout<<"E:\n";
 Ea.printMatrix();
 cout<<"Q:\n";
 Qa.printMatrix();
 cout<<"R:\n";
 Ra.printMatrix();
-cout<<"newE:\n";
+cout<<"newE:\n";*/
+Eb.printMatrix();
     Ea.~Matrix();
     Qa.~Matrix();
     Ra.~Matrix();
