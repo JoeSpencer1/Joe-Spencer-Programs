@@ -59,6 +59,8 @@ Matrix::Matrix(string fileName)
         matrix.push_back(row);
         row.clear();
     }
+    Q = matrix;
+    R = matrix;
     readMatrix.close();
     name = fileName;
     publish = true;
@@ -88,6 +90,8 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data)
     {
         name = longName(generateName());
     }
+    Q = matrix;
+    R = matrix;
     publish = true;
 }
 
@@ -111,6 +115,8 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data, bool keep)
             }
         }
     }
+    Q = matrix;
+    R = matrix;
     publish = false;
 }
 
@@ -175,6 +181,8 @@ Matrix::Matrix()
     {
         name = longName(generateName());
     }
+    Q = matrix;
+    R = matrix;
     publish = true;
 }
 
@@ -670,22 +678,12 @@ void Matrix::eigenValues()
 {
     Matrix A = Matrix(height, width, matrix);
     QR(height - 1, A);
-cout << '\t' << 1 << endl;
-//    Matrix Q = QRf[0];
-cout << '\t' << 2 << endl;
-//    Matrix R = QRf[1];
-cout << '\t' << 3 << endl;
 
-    cout << "R:\n";
-    QRf[1].printMatrix();
-    //Rf->printMatrix();
-    //R.printMatrix();
-    cout << "Q:\n";
 for (int i = 0; i < height; i++)
 {
     for (int j = 0; j < width; j++)
     {
-        cout << Qf[i][j] << " ";
+        cout << Q[i][j] << " ";
     }
     cout << endl;
 }
@@ -694,21 +692,19 @@ for (int i = 0; i < height; i++)
 {
     for (int j = 0; j < width; j++)
     {
-        cout << Rf[i][j] << " ";
+        cout << R[i][j] << " ";
     }
     cout << endl;
 }
-    //Qf->printMatrix();
-    //Q.printMatrix();
     return;
 }
 
-vector<Matrix> Matrix::QR(int n, Matrix Ea)
+void Matrix::QR(int n, Matrix Ea)
 {
     double length = 0;
     double temDep = 0;
     double error = 0;
-    vector<Matrix> QRf;
+    double temError = 0;
     vector<vector<double> > tempQ;
     vector<vector<double> > mu;
     tempQ = Ea.getMatrix();
@@ -771,76 +767,52 @@ vector<Matrix> Matrix::QR(int n, Matrix Ea)
         tempQ[i].clear();
     }
     tempQ.clear();
-    for (int i = 0; i < height; i++)
+    for (int i = n; i < height; i++)
     {
-        error += (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Eb.getMatrix()[i][i]);
-        if ((n > 0) && (((Ea.getMatrix()[n][n - 1] * Ea.getMatrix()[n][n - 1]) - (Eb.getMatrix()[n][n - 1] * Eb.getMatrix()[n][n - 1])) > error))
+        temError = (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Eb.getMatrix()[i][i]);
+        if ((i < width - 1) && (((Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i][i + 1]) - (Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i][i + 1])) > error))
         {
-            double a = Ea.getMatrix()[n][n - 1] * Ea.getMatrix()[n - 1][n];
-            double b = Eb.getMatrix()[n][n - 1] * Eb.getMatrix()[n - 1][n];
-            error += (a - b) * (a - b);
+            double a = Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i + 1][i];
+            double b = Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i + 1][i];
+            temError = (a - b) * (a - b);
+            i++;
+        }
+        error += temError;
+        if (temError > accuracy)
+        {
+            error += temError * height;
         }
     }
-/*    {
-        double a = Ea.getMatrix()[n][n - 1] * Ea.getMatrix()[n - 1][n];
-        double b = Eb.getMatrix()[n][n - 1] * Eb.getMatrix()[n - 1][n];
-        error = (a - b) * (a - b);
-        cout << "Error: " << error << endl;
-    }
-*/
-    if ((error * height < accuracy) && (error * height > 0 - accuracy))
+    if (error < accuracy * height)
     {
 cout <<"\t\t"<< n << endl;
         n--;
+cout << "Ea:\n";
 Ea.printMatrix();
+cout << "Eb:\n";
 Eb.printMatrix();
+cout << "Q:\n";
 Qa.printMatrix();
+cout << "R:\n";
 Ra.printMatrix();
         if (n < 1)
         {
-cout << "a\n";
-            QRf.clear();
-cout << "b\n";
-//            QRf.push_back(Qa);
-//            Qf = &Qa;
-//            Qf->printMatrix();
-//            QRf.push_back(Matrix(height, width, Qf.getMatrix()));
-//            QRf[0].setMatrix(Qf.getMatrix());
-//Eb.printMatrix();
-cout << "c\n";
-cout << Qa.getMatrix()[0][0] << endl;
-            for (int i = 0; i < height; i++)
-            {
-cout << i << " ";
-                for (int j = 0; j < width; j++)
-                {
-                    Qf[i][j] = Qa.getMatrix()[i][j];
-                }
-            }
-cout << Ra.getMatrix()[0][0] << endl;
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    Rf[i][j] = Ra.getMatrix()[i][j];
+                    Q[i][j] = Qa.getMatrix()[i][j];
                 }
             }
-//            Rf->printMatrix();
-//            QRf.push_back(Matrix(height, width, Rf.getMatrix()));
-//            QRf[1].setMatrix(QRf[1].getMatrix());
-//QRf[0].printMatrix();
-//QRf[1].printMatrix();
-cout << "Printed Rf\n";
-cout << "d\n";
-            return QRf;
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    R[i][j] = Ra.getMatrix()[i][j];
+                }
+            }
+            return;
         }
     }
-cout << "Rf:\n";
-//    Rf->printMatrix();
-cout << "e\n";
-/*
-    Ea.~Matrix();
-    Qa.~Matrix();
-    Ra.~Matrix();*/
-    return QR(n, Eb);
+    QR(n, Eb);
 }

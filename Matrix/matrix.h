@@ -29,8 +29,7 @@ public:
     bool invertible();
     double trace();
     void eigenValues();
-    vector<Matrix> QR(int n, Matrix Ea);
-/*void eigenVectors();*/
+    void QR(int n, Matrix Ea);
     // These are more of overhead functions for the program.
     void menu();
     void publishFile();
@@ -64,10 +63,9 @@ private:
     int height;
     int width;
     double norm;
-    vector<Matrix> QRf;
     
-    vector<vector<double> > Qf;
-    vector<vector<double> > Rf;
+    vector<vector<double> > Q;
+    vector<vector<double> > R;
 
     vector<double> realEigen;
     vector<double> imaginaryEigen;
@@ -76,8 +74,6 @@ private:
     double accuracy = 0.00001;
     vector<Matrix> matrixMenu;
     vector<int> numMenu;
-    vector<double> polynomial;
-    double pi = 3.141592653238;
     bool publish;
 };
 
