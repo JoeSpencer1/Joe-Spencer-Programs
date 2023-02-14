@@ -55,6 +55,7 @@ public:
     vector<double> complexRoot(double real, double imag, int pow);
     string longName(string shortName);
     Matrix householder();
+    void setMatrix(vector<vector<double> > toSet);
     vector<vector<double> > wilkinson(double a, double b, double c);
     vector<vector<double> > identity(double factor);
 private:
@@ -65,8 +66,8 @@ private:
     double norm;
     vector<Matrix> QRf;
     
-    Matrix * Qf;
-    Matrix * Rf;
+    vector<vector<double> > Qf;
+    vector<vector<double> > Rf;
 
     vector<double> realEigen;
     vector<double> imaginaryEigen;

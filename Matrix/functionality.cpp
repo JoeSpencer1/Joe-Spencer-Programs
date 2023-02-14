@@ -591,3 +591,28 @@ vector<vector<double> > Matrix::identity(double factor)
     }
     return tempMatrix;
 }
+    
+void Matrix::setMatrix(vector<vector<double> > toSet)
+{
+    vector<double> tempRow;
+    vector<vector<double> > newMatrix;
+    if (height != toSet.size())
+    {
+        height = toSet.size();
+    }
+    if ((height > 0) && (width != toSet[0].size()))
+    {
+        width = toSet[0].size();
+    }
+    matrix.clear();
+    for (int i = 0; i < height; i++)
+    {
+        tempRow.clear();
+        for (int j = 0; j < width; j++)
+        {
+            tempRow.push_back(toSet[i][j]);
+        }
+        matrix.push_back(tempRow);
+    }
+    return;
+}

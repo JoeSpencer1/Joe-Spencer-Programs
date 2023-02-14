@@ -675,11 +675,29 @@ cout << '\t' << 1 << endl;
 cout << '\t' << 2 << endl;
 //    Matrix R = QRf[1];
 cout << '\t' << 3 << endl;
+
     cout << "R:\n";
     QRf[1].printMatrix();
     //Rf->printMatrix();
     //R.printMatrix();
     cout << "Q:\n";
+for (int i = 0; i < height; i++)
+{
+    for (int j = 0; j < width; j++)
+    {
+        cout << Qf[i][j] << " ";
+    }
+    cout << endl;
+}
+cout << endl;
+for (int i = 0; i < height; i++)
+{
+    for (int j = 0; j < width; j++)
+    {
+        cout << Rf[i][j] << " ";
+    }
+    cout << endl;
+}
     //Qf->printMatrix();
     //Q.printMatrix();
     return;
@@ -747,56 +765,78 @@ vector<Matrix> Matrix::QR(int n, Matrix Ea)
     Matrix Et = Ea.subtract(muvec);
     Matrix Ra = Qt.cross(Et, false);
     Matrix Eb = Ra.cross(Qa , false).add(muvec);
-/*
-cout<<"R:\n";
-Ra.printMatrix();
-cout<<"Q:\n";
-Qa.printMatrix();
-cout<<"muvec\n";
-muvec.printMatrix();
-cout<<"Eb\n";
-Eb.printMatrix();
-cout<<"Ea\n";
-Ea.printMatrix();
-*/
     // This section checks if the matrix has been solved within the tolerance.
     for (int i = 0; i < height; i++)
     {
         tempQ[i].clear();
     }
     tempQ.clear();
-    error = (Eb.getMatrix()[n][n] - Ea.getMatrix()[n][n]) * (Eb.getMatrix()[n][n] - Eb.getMatrix()[n][n]);
-    if ((n > 0) && ((Eb.getMatrix()[n][n - 1] * Eb.getMatrix()[n][n - 1]) > error))
+    for (int i = 0; i < height; i++)
     {
+        error += (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Eb.getMatrix()[i][i]);
+        if ((n > 0) && (((Ea.getMatrix()[n][n - 1] * Ea.getMatrix()[n][n - 1]) - (Eb.getMatrix()[n][n - 1] * Eb.getMatrix()[n][n - 1])) > error))
+        {
+            double a = Ea.getMatrix()[n][n - 1] * Ea.getMatrix()[n - 1][n];
+            double b = Eb.getMatrix()[n][n - 1] * Eb.getMatrix()[n - 1][n];
+            error += (a - b) * (a - b);
+        }
+    }
+/*    {
         double a = Ea.getMatrix()[n][n - 1] * Ea.getMatrix()[n - 1][n];
         double b = Eb.getMatrix()[n][n - 1] * Eb.getMatrix()[n - 1][n];
         error = (a - b) * (a - b);
         cout << "Error: " << error << endl;
     }
-    if ((error < accuracy) && (error > 0 - accuracy))
+*/
+    if ((error * height < accuracy) && (error * height > 0 - accuracy))
     {
 cout <<"\t\t"<< n << endl;
         n--;
-        if (n == 0)
+Ea.printMatrix();
+Eb.printMatrix();
+Qa.printMatrix();
+Ra.printMatrix();
+        if (n < 1)
         {
 cout << "a\n";
             QRf.clear();
 cout << "b\n";
 //            QRf.push_back(Qa);
-            Qf = &Qa;
-            Qf->printMatrix();
-            QRf.push_back(Matrix(height, width, Qf->getMatrix()));
+//            Qf = &Qa;
+//            Qf->printMatrix();
+//            QRf.push_back(Matrix(height, width, Qf.getMatrix()));
+//            QRf[0].setMatrix(Qf.getMatrix());
+//Eb.printMatrix();
 cout << "c\n";
-            Rf = &Ra;
-            Rf->printMatrix();
-            QRf.push_back(Matrix(height, width, Rf->getMatrix()));
+cout << Qa.getMatrix()[0][0] << endl;
+            for (int i = 0; i < height; i++)
+            {
+cout << i << " ";
+                for (int j = 0; j < width; j++)
+                {
+                    Qf[i][j] = Qa.getMatrix()[i][j];
+                }
+            }
+cout << Ra.getMatrix()[0][0] << endl;
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    Rf[i][j] = Ra.getMatrix()[i][j];
+                }
+            }
+//            Rf->printMatrix();
+//            QRf.push_back(Matrix(height, width, Rf.getMatrix()));
+//            QRf[1].setMatrix(QRf[1].getMatrix());
+//QRf[0].printMatrix();
+//QRf[1].printMatrix();
 cout << "Printed Rf\n";
 cout << "d\n";
             return QRf;
         }
     }
 cout << "Rf:\n";
-    Rf->printMatrix();
+//    Rf->printMatrix();
 cout << "e\n";
 /*
     Ea.~Matrix();
