@@ -362,6 +362,8 @@ void Matrix::menu()
         if (choice == 7)
         {
             A.eigenValues();
+            cout << "Eigenvalues:\n";
+            A.printEigen();
         }
         if (choice == 8)
         {
@@ -441,73 +443,16 @@ void Matrix::menu()
     menu();
 }
 
-vector<double> Matrix::createPolynomial()
+vector<double> Matrix::polynomial(int row)
 {
     vector<double> polynomial;
-    vector<int> term;
-    double term1;
-    double term2;
-    int last;
-    /*
-    for (int i = 0; i <= height; i++)
-    {
-        term1 = 0;
-        term2 = 0;
-        term.clear();
-        for (int j = 0; j < i; j++)
-        {
-            term.push_back(j);
-        }
-        if (i == 0)
-        {
-            term1 = term2 = 1;
-            for (int j = 0; j < height; j++)
-            {
-                term1 *= matrix[j][j];
-                term2 *= matrix[j][height - j - 1];
-            }
-            polynomial.push_back(term1 - term2);
-        }
-        else
-        {
-            last = term.size() - 1;
-            term1 = 0;
-            while (term[0] <= (height - term.size()))
-            {
-                // This should find polynomials up to 4th degree.
-                term2 = 1.0;
-                for (int j = 0; i < term.size(); j++)
-                {
-                    term2 *= matrix[term[j]][term[j]] * -1;
-                }
-                term1 += term2;
-                if (last == 0)
-                {
-                    for (int i = 0; i < term.size(); i++)
-                    {
-                        term[i]++;
-                    }
-                    last = term.size() - 1;
-                }
-                else if (term[last] == (height + last - term.size()))
-                {
-                    last--;
-                }
-                else
-                {
-                    term[last]++;
-                }
-            }
-            polynomial.push_back(term1);
-        }
-    }
-    */
-    if (height == 2)
-    {
-        polynomial.push_back(matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]);
-        polynomial.push_back(-1 * (matrix[0][0] + matrix[1][1]));
-        polynomial.push_back(1);
-    }
+    double real;
+    double imaginary;
+    double a = 1.0;
+    double b = -1 * (E[row][row] + E[row + 1][row + 1]);
+    double c = E[row][row] * E[row + 1][row + 1] - E[row + 1][row] * E[row][row + 1];
+    polynomial.push_back(-1 * b / (2 * a));
+    polynomial.push_back(sqrt(4 * a * c - b * b) / (2 * a));
     return polynomial;
 }
 
@@ -590,6 +535,21 @@ vector<vector<double> > Matrix::identity(double factor)
         tempMatrix[i][i] = factor;
     }
     return tempMatrix;
+}
+
+void Matrix::printEigen()
+{
+    for (int i = 0; i < height; i++)
+    {
+        cout << realEigen[i];
+        if (imaginaryEigen[i] != 0)
+        {
+            cout << " + " << imaginaryEigen[i] << "i";
+            i++;
+            cout << endl << realEigen[i] << " - " << imaginaryEigen[i] << "i";
+        }
+        cout << endl;
+    }
 }
     
 void Matrix::setMatrix(vector<vector<double> > toSet)

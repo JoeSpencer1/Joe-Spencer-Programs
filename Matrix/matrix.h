@@ -30,10 +30,12 @@ public:
     double trace();
     void eigenValues();
     void QR(int n, Matrix Ea);
+    void eigen1x1();
+    void eigen2x2();
     // These are more of overhead functions for the program.
     void menu();
     void publishFile();
-    vector<double> createPolynomial();
+    vector<double> polynomial(int row);
     bool checkCompatibility(Matrix Other);
     int vectorPosition(vector<Matrix> matrixMenu, vector<int> numMenu);
     void checkValidity(ifstream & readMatrix);
@@ -44,6 +46,7 @@ public:
     vector<vector<double> > getMatrix();
     void printMatrix();
     void publishNew(int rows, int columns, vector<vector<double> > newMatrix);
+    void printEigen();
     string generateName();
     string findName();
     bool square();
@@ -63,10 +66,9 @@ private:
     int height;
     int width;
     double norm;
-    
     vector<vector<double> > Q;
     vector<vector<double> > R;
-
+    vector<vector<double> > E;
     vector<double> realEigen;
     vector<double> imaginaryEigen;
     vector<vector<double> > eigenVectors;

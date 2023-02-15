@@ -61,6 +61,7 @@ Matrix::Matrix(string fileName)
     }
     Q = matrix;
     R = matrix;
+    E = matrix;
     readMatrix.close();
     name = fileName;
     publish = true;
@@ -92,6 +93,7 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data)
     }
     Q = matrix;
     R = matrix;
+    E = matrix;
     publish = true;
 }
 
@@ -117,6 +119,7 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data, bool keep)
     }
     Q = matrix;
     R = matrix;
+    E = matrix;
     publish = false;
 }
 
@@ -183,6 +186,7 @@ Matrix::Matrix()
     }
     Q = matrix;
     R = matrix;
+    E = matrix;
     publish = true;
 }
 
@@ -677,30 +681,46 @@ double Matrix::trace()
 void Matrix::eigenValues()
 {
     Matrix A = Matrix(height, width, matrix);
+    vector<double> poly;
+    double real = 0;
+    double imaginary = 0;
     QR(height - 1, A);
-
-for (int i = 0; i < height; i++)
-{
-    for (int j = 0; j < width; j++)
+    for (int i = 0; i < height; i++)
     {
-        cout << Q[i][j] << " ";
+        if ((i < height - 1) && ((E[i + 1][i] > accuracy) || (E[i + 1][i] < 0 - accuracy)))
+        {
+            poly = polynomial(i);
+            real = poly[0];
+            imaginary = poly[1];
+            realEigen.push_back(real);
+            imaginaryEigen.push_back(imaginary);
+            realEigen.push_back(real);
+            imaginaryEigen.push_back(imaginary);
+            i++;
+        }
+        else
+        {
+            real = E[i][i];
+            imaginary = 0;
+            realEigen.push_back(real);
+            imaginaryEigen.push_back(imaginary);
+        }
     }
-    cout << endl;
-}
-cout << endl;
-for (int i = 0; i < height; i++)
-{
-    for (int j = 0; j < width; j++)
-    {
-        cout << R[i][j] << " ";
-    }
-    cout << endl;
-}
     return;
 }
 
 void Matrix::QR(int n, Matrix Ea)
 {
+    if (height == 1)
+    {
+        eigen1x1();
+        return;
+    }
+    if (height == 2)
+    {
+        eigen2x2();
+        return;
+    }
     double length = 0;
     double temDep = 0;
     double error = 0;
@@ -767,7 +787,7 @@ void Matrix::QR(int n, Matrix Ea)
         tempQ[i].clear();
     }
     tempQ.clear();
-    for (int i = n; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
         temError = (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Eb.getMatrix()[i][i]);
         if ((i < width - 1) && (((Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i][i + 1]) - (Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i][i + 1])) > error))
@@ -783,18 +803,18 @@ void Matrix::QR(int n, Matrix Ea)
             error += temError * height;
         }
     }
-    if (error < accuracy * height)
+    if (error < accuracy * accuracy * accuracy * height)
     {
-cout <<"\t\t"<< n << endl;
         n--;
-cout << "Ea:\n";
-Ea.printMatrix();
-cout << "Eb:\n";
-Eb.printMatrix();
-cout << "Q:\n";
-Qa.printMatrix();
-cout << "R:\n";
-Ra.printMatrix();
+        error = 0;
+        for (int i = 0; i < height - 1; i++)
+        {
+            error += Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i + 1][i];
+        }
+        if (error < accuracy)
+        {
+            n = 0;
+        }
         if (n < 1)
         {
             for (int i = 0; i < height; i++)
@@ -811,8 +831,59 @@ Ra.printMatrix();
                     R[i][j] = Ra.getMatrix()[i][j];
                 }
             }
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    E[i][j] = Ea.getMatrix()[i][j];
+                }
+            }
             return;
         }
     }
     QR(n, Eb);
+}
+
+void Matrix::eigen1x1()
+{
+    realEigen.push_back(matrix[0][0]);
+    imaginaryEigen.push_back(0);
+}
+
+void Matrix::eigen2x2()
+{
+    double real;
+    double imaginary;
+    double a = 1.0;
+    double b = -1 * (E[0][0] + E[1][1]);
+    double c = E[0][0] * E[1][1] - E[1][0] * E[0][1];
+    real = -1 * b / (2 * a);
+    imaginary = b * b - 4 * a * c;
+    if (imaginary > 0)
+    {
+        real += sqrt(imaginary);
+    }
+    if (imaginary < 0)
+    {
+        imaginary = sqrt(-1 * imaginary) / (2 * a);
+    }
+    else
+    {
+        imaginary = -1 * sqrt(imaginary) / (2 * a);
+    }
+    if (imaginary < 0)
+    {
+        realEigen.push_back(real + imaginary);
+        realEigen.push_back(real - imaginary);
+        imaginaryEigen.push_back(0);
+        imaginaryEigen.push_back(0);
+    }
+    else
+    {
+        imaginary *= -1;
+        realEigen.push_back(real);
+        realEigen.push_back(real);
+        imaginaryEigen.push_back(imaginary);
+        imaginaryEigen.push_back(imaginary);
+    }
 }
