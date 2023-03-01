@@ -364,6 +364,7 @@ void Matrix::menu()
             A.eigenValues();
             cout << "Eigenvalues:\n";
             A.printEigen();
+            A.eigenVecs();
         }
         if (choice == 8)
         {
@@ -575,4 +576,21 @@ void Matrix::setMatrix(vector<vector<double> > toSet)
         matrix.push_back(tempRow);
     }
     return;
+}
+
+bool Matrix::compareQR()
+{
+    bool equal = true;
+    for (int i = height - 1; i >= 0; i--)
+    {
+        for (int j = width - 1; j >= 0; j--)
+        {
+            if (matrix[i][j] != R[i][j])
+            {
+                equal = false;
+                break;
+            }
+        }
+    }
+    return equal;
 }

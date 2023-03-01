@@ -711,6 +711,10 @@ void Matrix::eigenValues()
 
 void Matrix::QR(int n, Matrix Ea)
 {
+    if (compareQR() == false)
+    {
+        return;
+    }
     if (height == 1)
     {
         eigen1x1();
@@ -789,13 +793,17 @@ void Matrix::QR(int n, Matrix Ea)
     tempQ.clear();
     for (int i = 0; i < height; i++)
     {
-        temError = (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Eb.getMatrix()[i][i]);
-        if ((i < width - 1) && (((Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i][i + 1]) - (Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i][i + 1])) > error))
+        if ((i < (height - 1)) && ((Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i + 1][i]) > (accuracy * accuracy)))
         {
             double a = Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i + 1][i];
             double b = Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i + 1][i];
             temError = (a - b) * (a - b);
-            i++;
+            temError = temError * temError;
+            i++;            
+        }
+        else
+        {
+            temError = (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]);
         }
         error += temError;
         if (temError > accuracy)
@@ -856,22 +864,18 @@ void Matrix::eigen2x2()
     double imaginary;
     double a = 1.0;
     double b = -1 * (E[0][0] + E[1][1]);
-    double c = E[0][0] * E[1][1] - E[1][0] * E[0][1];
+    double c = (E[0][0] * E[1][1]) - (E[0][1] * E[1][0]);
     real = -1 * b / (2 * a);
-    imaginary = b * b - 4 * a * c;
-    if (imaginary > 0)
-    {
-        real += sqrt(imaginary);
-    }
+    imaginary = (b * b - 4 * a * c) / ((2 * a) * (2 * a));
     if (imaginary < 0)
     {
-        imaginary = sqrt(-1 * imaginary) / (2 * a);
+        imaginary = -1 * sqrt(-1 * imaginary);
     }
     else
     {
-        imaginary = -1 * sqrt(imaginary) / (2 * a);
+        imaginary = sqrt(imaginary);
     }
-    if (imaginary < 0)
+    if (imaginary > 0)
     {
         realEigen.push_back(real + imaginary);
         realEigen.push_back(real - imaginary);
@@ -885,5 +889,23 @@ void Matrix::eigen2x2()
         realEigen.push_back(real);
         imaginaryEigen.push_back(imaginary);
         imaginaryEigen.push_back(imaginary);
+    }
+}
+
+void Matrix::eigenVecs()
+{
+    if (compareQR() == false)
+    {
+        Matrix A = Matrix(height, width, matrix);
+        QR(height - 1, A);
+    }
+    for (int i = 0; i < width; i++)
+    {
+        cout << (i + 1) << ":\n";
+        for (int j = 0; j < height; j++)
+        {
+            cout << R[i][j] << endl;
+        }
+        cout << endl;
     }
 }

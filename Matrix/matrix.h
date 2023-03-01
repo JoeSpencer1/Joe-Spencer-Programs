@@ -32,6 +32,7 @@ public:
     void QR(int n, Matrix Ea);
     void eigen1x1();
     void eigen2x2();
+    void eigenVecs();
     // These are more of overhead functions for the program.
     void menu();
     void publishFile();
@@ -60,6 +61,7 @@ public:
     void setMatrix(vector<vector<double> > toSet);
     vector<vector<double> > wilkinson(double a, double b, double c);
     vector<vector<double> > identity(double factor);
+    bool compareQR();
 private:
     vector<vector<double> > matrix;
     string name;
