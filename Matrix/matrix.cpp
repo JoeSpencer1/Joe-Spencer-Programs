@@ -203,7 +203,7 @@ Matrix::~Matrix()
     E.clear();*/
     realEigen.clear();
     imaginaryEigen.clear();
-    eigenVectors.clear();
+    realEigenVectors.clear();
     matrixMenu.clear();
 };
 
@@ -856,6 +856,9 @@ void Matrix::eigen1x1()
 {
     realEigen.push_back(matrix[0][0]);
     imaginaryEigen.push_back(0);
+    vector<double> eigenVec;
+    eigenVec.push_back(1.0);
+    realEigenVectors.push_back(eigenVec);
 }
 
 void Matrix::eigen2x2()
@@ -865,6 +868,7 @@ void Matrix::eigen2x2()
     double a = 1.0;
     double b = -1 * (E[0][0] + E[1][1]);
     double c = (E[0][0] * E[1][1]) - (E[0][1] * E[1][0]);
+    vector<double> eigenVec;
     real = -1 * b / (2 * a);
     imaginary = (b * b - 4 * a * c) / ((2 * a) * (2 * a));
     if (imaginary < 0)
@@ -894,18 +898,48 @@ void Matrix::eigen2x2()
 
 void Matrix::eigenVecs()
 {
+    vector<vector<double> > copy = matrix;
+    vector<vector<double> > complex = matrix;
+    vector<vector<double> > rAlgebra = matrix;
+    vector<vector<double> > cAlgebra = matrix;
+    vector<double> tempRow;
+    vector<double> rEigenV;
+    vector<double> cEigenV;
     if (compareQR() == false)
     {
         Matrix A = Matrix(height, width, matrix);
         QR(height - 1, A);
     }
-    for (int i = 0; i < width; i++)
+    for (int i = 0; i < height; i++)
     {
-        cout << (i + 1) << ":\n";
+        // Duplicate the matrix
+        copy.clear();
+        rEigenV.clear();
+        cEigenV.clear();
+        copy = matrix;
         for (int j = 0; j < height; j++)
         {
-            cout << R[i][j] << endl;
+            rEigenV.push_back(0);
+            cEigenV.push_back(0);
+            for (int k = 0; k < width; k++)
+            {
+                complex[j][k] = 0;
+                rAlgebra[j][k] = 0;
+                cAlgebra[j][k] = 0;
+            }
         }
-        cout << endl;
+        // Subtract eigenvalue from copy
+        for (int j = 0; j < height; j++)
+        {
+            copy[j][j] -= realEigen[i];
+            complex[j][j] -= imaginaryEigen[i];
+        }
+        // Find eigenvector that multiplies to zero with copy
+        for (int j = 0; j < height; j++)
+        {
+            for (int k = j + 1 + 1; k < width; k++)
+            {
+            }
+        }
     }
 }

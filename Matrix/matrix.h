@@ -73,7 +73,8 @@ private:
     vector<vector<double> > E;
     vector<double> realEigen;
     vector<double> imaginaryEigen;
-    vector<vector<double> > eigenVectors;
+    vector<vector<double> > realEigenVectors;
+    vector<vector<double> > imaginaryEigenVectors;
     double tolerance = 0.01;
     double accuracy = 0.00001;
     vector<Matrix> matrixMenu;
