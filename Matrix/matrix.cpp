@@ -900,11 +900,9 @@ void Matrix::eigenVecs()
 {
     vector<vector<double> > copy = matrix;
     vector<vector<double> > complex = matrix;
-    vector<vector<double> > rAlgebra = matrix;
-    vector<vector<double> > cAlgebra = matrix;
-    vector<double> tempRow;
     vector<double> rEigenV;
     vector<double> cEigenV;
+    int bottom = height - 1;
     if (compareQR() == false)
     {
         Matrix A = Matrix(height, width, matrix);
@@ -924,8 +922,6 @@ void Matrix::eigenVecs()
             for (int k = 0; k < width; k++)
             {
                 complex[j][k] = 0;
-                rAlgebra[j][k] = 0;
-                cAlgebra[j][k] = 0;
             }
         }
         // Subtract eigenvalue from copy
@@ -934,12 +930,49 @@ void Matrix::eigenVecs()
             copy[j][j] -= realEigen[i];
             complex[j][j] -= imaginaryEigen[i];
         }
-        // Find eigenvector that multiplies to zero with copy
+        // Subtract previous row from current row
         for (int j = 0; j < height; j++)
         {
-            for (int k = j + 1 + 1; k < width; k++)
+            // Change first entry of row to 1
+            for (int k = width - 1; k >= j; k--)
             {
+                if (copy[j][j] != 0)
+                {
+                    copy[j][k] /= copy[j][j];
+                }
+            }
+            // Subtract previous rows
+            for (int k = j; k < height; k++)
+            {
+                for (int l = width - 1; l >= 0; l--)
+                {
+                    copy[k][l] -= copy[j][l] * copy[k][j];
+                }
             }
         }
+        // Make sure final value is nonzero
+        while (copy[bottom][bottom] == 0)
+        {
+            for (int i = 0; i < height; i++)
+            {
+                copy[i][bottom] = 0;
+            }
+            rEigenV[bottom] = 0;
+            bottom --;
+        }
+        // Delete from upper rows.
+        rEigenV[bottom] = 1;
+        for (int j = bottom - 1; j >= 0; j--)
+        {
+            rEigenV[j] = 0;
+            for (int k = width - 1; k > j; k--)
+            {
+                rEigenV[j] -= realEigen[k] * copy[j][k];
+            }
+        }
+        // Push eigenvectors to eigenvectors vector
+        realEigenVectors.push_back(rEigenV);
+        rEigenV.clear();
     }
+    return;
 }
