@@ -950,14 +950,14 @@ void Matrix::eigenVecs()
         for (int j = 0; j < (height * 2); j++)
         {
             factor1 = BaaB[j][j];
-            for (int k = (j + 1); k < BaaB.size(); k++)
+            for (int k = (j + 1); k < (height * 2); k++)
             {
                 factor2 = 0;
                 if (factor1 != 0)
                 {
                     factor2 = BaaB[k][j] / factor1;
                 }
-                for (int l = j; l < BaaB.size(); l++)
+                for (int l = k; l < (height * 2); l++)
                 {
                     BaaB[k][l] -= factor2 * BaaB[j][l];
                 }
