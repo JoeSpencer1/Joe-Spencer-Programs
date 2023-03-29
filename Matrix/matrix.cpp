@@ -892,87 +892,135 @@ void Matrix::eigen2x2()
         realEigen.push_back(real);
         realEigen.push_back(real);
         imaginaryEigen.push_back(imaginary);
-        imaginaryEigen.push_back(imaginary);
+        imaginaryEigen.push_back(0 - imaginary);
     }
 }
 
 void Matrix::eigenVecs()
 {
-    vector<vector<double> > copy = matrix;
-    vector<vector<double> > complex = matrix;
-    vector<double> rEigenV;
-    vector<double> cEigenV;
-    int bottom = height - 1;
-    if (compareQR() == false)
-    {
-        Matrix A = Matrix(height, width, matrix);
-        QR(height - 1, A);
-    }
+    /*
+    You can set up 2 equations, with a as the real portion and b as the
+    imaginary portion, so λ=a+bi. They are:
+    (A-aI)yr-bIyi=0, (A-aI)yi+bIyr=0
+    If you make a 2n*2n matrix you can solve this. It looks like this:
+
+    [A-aI     -bi] [vr ] =  [0]
+    [b    (A-aI)i] [vii]    [0]   This means that
+
+    [A-aI     b ] [vr]  =  [0] 
+    [b      A-ai] [vi]     [0]    or:
+
+    [b      A-ai] [vi]  =  [0]
+    [A-ai      b] [vr]     [0]
+    */
+    vector<vector<double> > BaaB;
+    vector<double> rEigenv;
+    vector<double> cEigenv;
+    vector<double> tempRow;
+    int bottom;
+    double factor1;
+    double factor2;
     for (int i = 0; i < height; i++)
     {
-        // Duplicate the matrix
-        copy.clear();
-        rEigenV.clear();
-        cEigenV.clear();
-        copy = matrix;
-        for (int j = 0; j < height; j++)
+        // Construct BaaB matrix
+        for (int j = 0; j < (height * 2); j++)
         {
-            rEigenV.push_back(0);
-            cEigenV.push_back(0);
-            for (int k = 0; k < width; k++)
+            for (int k = 0; k < (width * 2); k++)
             {
-                complex[j][k] = 0;
-            }
-        }
-        // Subtract eigenvalue from copy
-        for (int j = 0; j < height; j++)
-        {
-            copy[j][j] -= realEigen[i];
-            complex[j][j] -= imaginaryEigen[i];
-        }
-        // Subtract previous row from current row
-        for (int j = 0; j < height; j++)
-        {
-            // Change first entry of row to 1
-            for (int k = width - 1; k >= j; k--)
-            {
-                if (copy[j][j] != 0)
+                if (((j < height) && (k < height)) || ((j >= height) && (k >= height)))
                 {
-                    copy[j][k] /= copy[j][j];
+                    tempRow.push_back(matrix[j][k] - realEigen[i]);
+                }
+                else
+                {
+                    if ((k == (j + width)) || (k == j - width))
+                    {
+                        tempRow.push_back(imaginaryEigen[i]);
+                    }
+                    else
+                    {
+                        tempRow.push_back(0);
+                    }
                 }
             }
-            // Subtract previous rows
-            for (int k = j; k < height; k++)
+            BaaB.push_back(tempRow);
+            tempRow.clear();
+        }
+        // Algebraically solve BaaB
+        for (int j = 0; j < (height * 2); j++)
+        {
+            factor1 = BaaB[j][j];
+            for (int k = (j + 1); k < BaaB.size(); k++)
             {
-                for (int l = width - 1; l >= 0; l--)
+                factor2 = 0;
+                if (factor1 != 0)
                 {
-                    copy[k][l] -= copy[j][l] * copy[k][j];
+                    factor2 = BaaB[k][j] / factor1;
+                }
+                for (int l = j; l < BaaB.size(); l++)
+                {
+                    BaaB[k][l] -= factor2 * BaaB[j][l];
                 }
             }
         }
-        // Make sure final value is nonzero
-        while (copy[bottom][bottom] == 0)
+        // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
+        bottom = height * 2 - 1;
+        while (BaaB[bottom][bottom] != 0)
         {
-            for (int i = 0; i < height; i++)
+            for (int j = 0; j < bottom; j++)
             {
-                copy[i][bottom] = 0;
+                BaaB[j][bottom] = 0;
             }
-            rEigenV[bottom] = 0;
             bottom --;
         }
-        // Delete from upper rows.
-        rEigenV[bottom] = 1;
+        // Put in value for starting eigenvectors
+        rEigenv.clear();
+        cEigenv.clear();
+        for (int j = 0; j < height; j++)
+        {
+            rEigenv.push_back(0);
+            cEigenv.push_back(0);
+        }
+        // Set bottom entry of eigenvector to one
+        if (bottom < height)
+        {
+            cEigenv[bottom] = 1;
+        }
+        else
+        {
+            rEigenv[bottom - height] = 1;
+        }
         for (int j = bottom - 1; j >= 0; j--)
         {
-            rEigenV[j] = 0;
-            for (int k = width - 1; k > j; k--)
+            if (j >= height)
             {
-                rEigenV[j] -= realEigen[k] * copy[j][k];
+                rEigenv[j % height] = -1 * BaaB[j][bottom];
+            }
+            else
+            {
+                cEigenv[j] = -1 * BaaB[j][bottom];
             }
         }
-        // Push eigenvectors to eigenvectors vector
-        realEigenVectors.push_back(rEigenV);
-        rEigenV.clear();
+        // Algebraically solve for other entries of eigenvector.
+        for (int j = bottom - 1; j >= 0; j--)
+        {
+            factor1 = BaaB[j][j];
+            for (int k = j - 1; k >= 0; k--)
+            {
+                if (k >= height)
+                {
+                    rEigenv[k % height] = -1 * BaaB[j][k];
+                }
+                else
+                {
+                    cEigenv[k] = -1 * BaaB[j][k];
+                }
+            }
+        }
+        realEigenVectors.push_back(rEigenv);
+        imaginaryEigenVectors.push_back(cEigenv);
+        rEigenv.clear();
+        cEigenv.clear();
     }
     return;
 }

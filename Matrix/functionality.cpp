@@ -365,6 +365,8 @@ void Matrix::menu()
             cout << "Eigenvalues:\n";
             A.printEigen();
             A.eigenVecs();
+            cout << "Eigenvectors:\n";
+            A.printEigenVec();
         }
         if (choice == 8)
         {
@@ -593,4 +595,39 @@ bool Matrix::compareQR()
         }
     }
     return equal;
+}
+
+void Matrix::printEigenVec()
+{
+    for (int i = 0; i < height; i++)
+    {
+        cout << i << ": \n";
+        for (int j = 0; j < height; j++)
+        {
+            if ((realEigenVectors[i][j] > tolerance) || (realEigenVectors[i][j] < (0 - tolerance)))
+            {
+                cout << realEigenVectors[i][j];
+            }
+            if ((imaginaryEigenVectors[i][j] > tolerance) || (imaginaryEigenVectors[i][j] < (0 - tolerance)))
+            {
+                if ((realEigenVectors[i][j] > tolerance) || (realEigenVectors[i][j] < (0 - tolerance)))
+                {
+                    if (imaginaryEigenVectors[i][j] > 0)
+                    {
+                        cout << " + " << imaginaryEigenVectors[i][j] << "i";
+                    }
+                    else
+                    {
+                        cout << " - " << (-1 * imaginaryEigenVectors[i][j]) << "i";
+                    }
+                }
+                else
+                {
+                    cout << imaginaryEigenVectors[i][j] << "i";
+                }
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
 }

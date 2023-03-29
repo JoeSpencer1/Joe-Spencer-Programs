@@ -62,6 +62,7 @@ public:
     vector<vector<double> > wilkinson(double a, double b, double c);
     vector<vector<double> > identity(double factor);
     bool compareQR();
+    void printEigenVec();
 private:
     vector<vector<double> > matrix;
     string name;
