@@ -929,11 +929,7 @@ void Matrix::eigenVecs()
             {
                 if (((j < height) && (k < height)) || ((j >= height) && (k >= height)))
                 {
-                    tempRow.push_back(matrix[j][k] - realEigen[i]);
-                }
-                else
-                {
-                    if ((k == (j + width)) || (k == j - width))
+                    if ((k == j) || (k == j + width))
                     {
                         tempRow.push_back(imaginaryEigen[i]);
                     }
@@ -941,6 +937,10 @@ void Matrix::eigenVecs()
                     {
                         tempRow.push_back(0);
                     }
+                }
+                else
+                {
+                    tempRow.push_back(matrix[j][k] - realEigen[i]);
                 }
             }
             BaaB.push_back(tempRow);

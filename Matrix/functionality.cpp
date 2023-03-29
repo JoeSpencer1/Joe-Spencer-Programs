@@ -604,7 +604,8 @@ void Matrix::printEigenVec()
         cout << i << ": \n";
         for (int j = 0; j < height; j++)
         {
-            if ((realEigenVectors[i][j] > tolerance) || (realEigenVectors[i][j] < (0 - tolerance)))
+            if ((realEigenVectors[i][j] > tolerance) || (realEigenVectors[i][j] < (0 - tolerance))
+            || (imaginaryEigenVectors[i][j] == 0))
             {
                 cout << realEigenVectors[i][j];
             }
