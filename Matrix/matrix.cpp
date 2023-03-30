@@ -940,12 +940,24 @@ void Matrix::eigenVecs()
                 }
                 else
                 {
-                    tempRow.push_back(matrix[j][k] - realEigen[i]);
+                    if (k < width)
+                    {
+                        tempRow.push_back(matrix[j - width][k]);
+                    }
+                    else
+                    {
+                        tempRow.push_back(matrix[j][k - width]);
+                    }
+                    if ((k == (j - width)) || (k == (j + width)))
+                    {
+                        tempRow[k] -= realEigen[i];
+                    }
                 }
             }
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
+cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
         // Algebraically solve BaaB
         for (int j = 0; j < (height * 2); j++)
         {
@@ -956,16 +968,17 @@ void Matrix::eigenVecs()
                 if (factor1 != 0)
                 {
                     factor2 = BaaB[k][j] / factor1;
-                }
-                for (int l = k; l < (height * 2); l++)
-                {
-                    BaaB[k][l] -= factor2 * BaaB[j][l];
+                    for (int l = k; l < (height * 2); l++)
+                    {
+                        BaaB[k][l] -= factor2 * BaaB[j][l];
+                    }
                 }
             }
         }
+//cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
         // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
         bottom = height * 2 - 1;
-        while (BaaB[bottom][bottom] != 0)
+        while ((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance)))
         {
             for (int j = 0; j < bottom; j++)
             {
@@ -1021,6 +1034,7 @@ void Matrix::eigenVecs()
         imaginaryEigenVectors.push_back(cEigenv);
         rEigenv.clear();
         cEigenv.clear();
+        BaaB.clear();
     }
     return;
 }
