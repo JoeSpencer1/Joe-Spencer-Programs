@@ -917,6 +917,8 @@ void Matrix::eigenVecs()
     vector<double> rEigenv;
     vector<double> cEigenv;
     vector<double> tempRow;
+    vector<int> order;
+    int row;
     int bottom;
     double factor1;
     double factor2;
@@ -925,8 +927,10 @@ void Matrix::eigenVecs()
         // Construct BaaB matrix
         for (int j = 0; j < (height * 2); j++)
         {
+            order.push_back(j);
             for (int k = 0; k < (width * 2); k++)
             {
+                order.push_back(k);
                 if (((j < height) && (k < height)) || ((j >= height) && (k >= height)))
                 {
                     if ((k == j) || (k == j + width))
@@ -957,30 +961,69 @@ void Matrix::eigenVecs()
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
-cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
-        // Algebraically solve BaaB
-        for (int j = 0; j < (height * 2); j++)
+//cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}cout<<"\n";
+        // Rearrange BaaB so it does not have any zero entries down its main diagonal.
+        if (imaginaryEigen[i] == 0)
         {
-            factor1 = BaaB[j][j];
-            for (int k = (j + 1); k < (height * 2); k++)
+            for (int j = 0; j < height; j++)
             {
-                factor2 = 0;
-                if (factor1 != 0)
+                tempRow = BaaB[j];
+                for (int k = 0; k < width * 2; k++)
                 {
-                    factor2 = BaaB[k][j] / factor1;
-                    for (int l = k; l < (height * 2); l++)
+                    BaaB[j][k] = BaaB[j + height][k];
+                }
+                BaaB[j + height] = tempRow;
+                order[j] = j + height;
+                order[j + height] = j;
+            }
+            for (int j = 0; j < height - 1; j++)
+            {
+                if (BaaB[j][j] == 0)
+                {
+                    for (int k = j + 1; k < height; k++)
                     {
-                        BaaB[k][l] -= factor2 * BaaB[j][l];
+                        if (BaaB[k][j] != 0)
+                        {
+                            tempRow = BaaB[j];
+                            BaaB[j] = BaaB[k];
+                            BaaB[j + height] = BaaB[k];
+                            BaaB[k] = tempRow;
+                            BaaB[k + height] = tempRow;
+                            row = order[j];
+                            order[j] = order[k];
+                            order[j + height] = order[k];
+                            order[k] = row;
+                            order[k + height] = row;
+                        }
                     }
                 }
             }
         }
-//cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
+//cout<<"BaaB2:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
+        // Algebraically solve BaaB
+        for (int j = 0; j < (height * 2); j++)
+        {
+            factor1 = BaaB[j][j];
+//cout<<"1:" <<factor1 << endl;
+            if ((factor1 < (0 - tolerance)) || (factor1 > tolerance))
+            {
+                for (int k = (j + 1); k < (height * 2); k++)
+                {
+                    factor2 = BaaB[k][j] / factor1;
+//cout<<"2: "<< factor2 << endl;
+                    for (int l = 0; l < (width * 2); l++)
+                    {
+                        BaaB[k][l] -= BaaB[j][l] * factor2;
+                    }
+                }
+            }
+        }
+cout<<"BaaB3:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
         // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
         bottom = height * 2 - 1;
         while ((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance)))
         {
-            for (int j = 0; j < bottom; j++)
+            for (int j = 0; j < (height * 2); j++)
             {
                 BaaB[j][bottom] = 0;
             }
@@ -995,9 +1038,9 @@ cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.
             cEigenv.push_back(0);
         }
         // Set bottom entry of eigenvector to one
-        if (bottom < height)
+/*        if (bottom < height)
         {
-            cEigenv[bottom] = 1;
+            cEigenv[bottom] = 1.0;
         }
         else
         {
@@ -1013,7 +1056,7 @@ cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.
             {
                 cEigenv[j] = -1 * BaaB[j][bottom];
             }
-        }
+*/        }
         // Algebraically solve for other entries of eigenvector.
         for (int j = bottom - 1; j >= 0; j--)
         {
@@ -1032,6 +1075,8 @@ cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.
         }
         realEigenVectors.push_back(rEigenv);
         imaginaryEigenVectors.push_back(cEigenv);
+        tempRow.clear();
+        order.clear();
         rEigenv.clear();
         cEigenv.clear();
         BaaB.clear();

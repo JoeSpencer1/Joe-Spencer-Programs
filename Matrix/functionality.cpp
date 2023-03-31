@@ -601,7 +601,7 @@ void Matrix::printEigenVec()
 {
     for (int i = 0; i < height; i++)
     {
-        cout << i << ": \n";
+        cout << (i + 1) << ": \n";
         for (int j = 0; j < height; j++)
         {
             if ((realEigenVectors[i][j] > tolerance) || (realEigenVectors[i][j] < (0 - tolerance))
