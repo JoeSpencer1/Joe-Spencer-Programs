@@ -907,7 +907,7 @@ void Matrix::eigenVecs()
     [A-aI     -bi] [vr ] =  [0]
     [b    (A-aI)i] [vii]    [0]   This means that
 
-    [A-aI     b ] [vr]  =  [0] 
+    [A-aI      b] [vr]  =  [0] 
     [b      A-ai] [vi]     [0]    or:
 
     [b      A-ai] [vi]  =  [0]
@@ -916,6 +916,7 @@ void Matrix::eigenVecs()
     vector<vector<double> > BaaB;
     vector<double> rEigenv;
     vector<double> cEigenv;
+    vector<double> tEigenv;
     vector<double> tempRow;
     vector<int> order;
     int row;
@@ -927,13 +928,18 @@ void Matrix::eigenVecs()
         // Construct BaaB matrix
         for (int j = 0; j < (height * 2); j++)
         {
+            tEigenv.push_back(0);
             order.push_back(j);
             for (int k = 0; k < (width * 2); k++)
             {
                 order.push_back(k);
                 if (((j < height) && (k < height)) || ((j >= height) && (k >= height)))
                 {
-                    if ((k == j) || (k == j + width))
+                    if (k == j)
+                    {
+                        tempRow.push_back(imaginaryEigen[i]);
+                    }
+                    if (k == j + width)
                     {
                         tempRow.push_back(imaginaryEigen[i]);
                     }
@@ -961,7 +967,6 @@ void Matrix::eigenVecs()
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
-//cout<<"BaaB:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}cout<<"\n";
         // Rearrange BaaB so it does not have any zero entries down its main diagonal.
         if (imaginaryEigen[i] == 0)
         {
@@ -999,18 +1004,15 @@ void Matrix::eigenVecs()
                 }
             }
         }
-//cout<<"BaaB2:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
         // Algebraically solve BaaB
         for (int j = 0; j < (height * 2); j++)
         {
             factor1 = BaaB[j][j];
-//cout<<"1:" <<factor1 << endl;
             if ((factor1 < (0 - tolerance)) || (factor1 > tolerance))
             {
                 for (int k = (j + 1); k < (height * 2); k++)
                 {
                     factor2 = BaaB[k][j] / factor1;
-//cout<<"2: "<< factor2 << endl;
                     for (int l = 0; l < (width * 2); l++)
                     {
                         BaaB[k][l] -= BaaB[j][l] * factor2;
@@ -1018,7 +1020,6 @@ void Matrix::eigenVecs()
                 }
             }
         }
-cout<<"BaaB3:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout<<int(BaaB[i][j])<<" ";}cout<<"\n";}
         // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
         bottom = height * 2 - 1;
         while ((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance)))
@@ -1029,49 +1030,82 @@ cout<<"BaaB3:\n"; for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB
             }
             bottom --;
         }
+cout << "Bottom: " << bottom << endl;
+for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Put in value for starting eigenvectors
         rEigenv.clear();
         cEigenv.clear();
+        tEigenv.clear();
         for (int j = 0; j < height; j++)
         {
             rEigenv.push_back(0);
             cEigenv.push_back(0);
+            tEigenv.push_back(0);
+            tEigenv.push_back(0);
         }
-        // Set bottom entry of eigenvector to one
-/*        if (bottom < height)
+        // Set bottom entry of eigenvector set equal to 1 whether real or imaginary
+        for (int j = height * 2 - 1; j > bottom; j--)
         {
-            cEigenv[bottom] = 1.0;
+            tEigenv[j] = 0;
         }
-        else
-        {
-            rEigenv[bottom - height] = 1;
-        }
+        tEigenv[bottom] = 1;
         for (int j = bottom - 1; j >= 0; j--)
         {
-            if (j >= height)
+            factor2 = BaaB[j][bottom] / BaaB[bottom][bottom];
+            for (int k = 0; k < width * 2; k++)
             {
-                rEigenv[j % height] = -1 * BaaB[j][bottom];
+                BaaB[j][k] -= BaaB[bottom][k] * factor2;
             }
-            else
-            {
-                cEigenv[j] = -1 * BaaB[j][bottom];
-            }
-*/        }
+        }
         // Algebraically solve for other entries of eigenvector.
         for (int j = bottom - 1; j >= 0; j--)
         {
             factor1 = BaaB[j][j];
-            for (int k = j - 1; k >= 0; k--)
+            if ((factor1 > accuracy) || (factor1 < (0 - accuracy)))
             {
-                if (k >= height)
+                for (int k = j - 1; k >= 0; k--)
                 {
-                    rEigenv[k % height] = -1 * BaaB[j][k];
-                }
-                else
-                {
-                    cEigenv[k] = -1 * BaaB[j][k];
+                    factor2 = BaaB[k][j] / factor1;
+                    for (int l = 0; l < 2 * width; l++)
+                    {
+                        BaaB[k][l] -= factor2 * BaaB[j][l];
+                    }
                 }
             }
+        }
+        // Create real and complex eigenvectors
+        for (int j = 0; j < height * 2; j++)
+        {
+            if (order[j] >= height)
+            {
+                rEigenv[order[j]] = BaaB[j][j];
+cout << "rEigenv[" << order[j] << "]: " << rEigenv[order[j]] << endl;
+            }
+            else
+            {
+                cEigenv[order[j] % height] = BaaB[j][j];
+cout << "cEigenv[" << order[j] << "]: " << cEigenv[order[j]] << endl;
+            }
+        }
+        // Set bottom entry to one
+        bottom = height - 1;
+        while ((rEigenv[bottom] == 0) && (cEigenv[bottom] == 0))
+        {
+            bottom--;
+        }
+        if ((rEigenv[bottom] > accuracy) || (rEigenv[bottom] < (0 - accuracy)))
+        {
+            factor1 = rEigenv[bottom];
+        }
+        else
+        {
+            factor1 = cEigenv[bottom];
+        }
+        for (int j = 0; j < height; j++)
+        {
+            rEigenv[j] /= factor1;
+            cEigenv[j] /= factor1;
+            cout << rEigenv[j] << ' ' << cEigenv[j] << '\n';
         }
         realEigenVectors.push_back(rEigenv);
         imaginaryEigenVectors.push_back(cEigenv);
