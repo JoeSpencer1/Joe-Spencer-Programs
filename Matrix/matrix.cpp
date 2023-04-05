@@ -912,6 +912,10 @@ void Matrix::eigenVecs()
 
     [b      A-ai] [vi]  =  [0]
     [A-ai      b] [vr]     [0]
+
+    Eigenvectors for the first case should be [1.50338, 2.11671, 2.8933, 1], 
+    [-0.309574, -0.110989, -0.95844, 1], [-0.120387, 0.163608, 1.35782, 1],
+    [-2.51515, 2.18569, -1.75811, 1]
     */
     vector<vector<double> > BaaB;
     vector<double> rEigenv;
@@ -1073,6 +1077,7 @@ for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j
                 }
             }
         }
+for (int i = 0; i < height * 2; i++){cout << tEigenv[i] << ' ';}cout<<endl;
         // Create real and complex eigenvectors
         for (int j = 0; j < height * 2; j++)
         {
