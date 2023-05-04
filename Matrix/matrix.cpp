@@ -1000,9 +1000,9 @@ void Matrix::eigenVecs()
                             BaaB[k + height] = tempRow;
                             row = order[j];
                             order[j] = order[k];
-                            order[j + height] = order[k];
+                            order[j + height] = order[k + height];
                             order[k] = row;
-                            order[k + height] = row;
+                            order[k + height] = row + height;
                         }
                     }
                 }
@@ -1034,8 +1034,6 @@ void Matrix::eigenVecs()
             }
             bottom --;
         }
-cout << "Bottom: " << bottom << endl;
-for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Put in value for starting eigenvectors
         rEigenv.clear();
         cEigenv.clear();
@@ -1048,10 +1046,6 @@ for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j
             tEigenv.push_back(0);
         }
         // Set bottom entry of eigenvector set equal to 1 whether real or imaginary
-        for (int j = height * 2 - 1; j > bottom; j--)
-        {
-            tEigenv[j] = 0;
-        }
         tEigenv[bottom] = 1;
         for (int j = bottom - 1; j >= 0; j--)
         {
@@ -1077,19 +1071,18 @@ for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j
                 }
             }
         }
-for (int i = 0; i < height * 2; i++){cout << tEigenv[i] << ' ';}cout<<endl;
+//for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
+for(int i = 0; i < height * 2; i++){cout << order[i] << " ";}cout<<endl;
         // Create real and complex eigenvectors
         for (int j = 0; j < height * 2; j++)
         {
             if (order[j] >= height)
             {
-                rEigenv[order[j]] = BaaB[j][j];
-cout << "rEigenv[" << order[j] << "]: " << rEigenv[order[j]] << endl;
+                rEigenv[order[j] % height] = BaaB[j][j];
             }
             else
             {
-                cEigenv[order[j] % height] = BaaB[j][j];
-cout << "cEigenv[" << order[j] << "]: " << cEigenv[order[j]] << endl;
+                cEigenv[order[j]] = BaaB[j][j];
             }
         }
         // Set bottom entry to one
@@ -1110,7 +1103,7 @@ cout << "cEigenv[" << order[j] << "]: " << cEigenv[order[j]] << endl;
         {
             rEigenv[j] /= factor1;
             cEigenv[j] /= factor1;
-            cout << rEigenv[j] << ' ' << cEigenv[j] << '\n';
+//            cout << rEigenv[j] << ' ' << cEigenv[j] << '\n';
         }
         realEigenVectors.push_back(rEigenv);
         imaginaryEigenVectors.push_back(cEigenv);
