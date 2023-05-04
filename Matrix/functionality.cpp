@@ -288,6 +288,7 @@ vector<vector<double> > Matrix::rref()
 
 void Matrix::menu()
 {
+    string pchoice;
     int choice;
     bool existing;
     int position;
@@ -296,7 +297,71 @@ void Matrix::menu()
     double tr;
     cout << "Please select your desired matrix option:\n";
     cout << "Press 0 to view menu.\n";
-    cin >> choice;
+    cin >> pchoice;
+    if (pchoice == "0")
+    {
+        choice = 0;
+    }
+    if (pchoice == "1")
+    {
+        choice = 1;
+    }
+    else if (pchoice == "2")
+    {
+        choice = 2;
+    }
+    else if (pchoice == "3")
+    {
+        choice = 3;
+    }
+    else if (pchoice == "4")
+    {
+        choice = 4;
+    }
+    else if (pchoice == "5")
+    {
+        choice = 5;
+    }
+    else if (pchoice == "6")
+    {
+        choice = 6;
+    }
+    else if (pchoice == "7")
+    {
+        choice = 7;
+    }
+    else if (pchoice == "8")
+    {
+        choice = 8;
+    }
+    else if (pchoice == "9")
+    {
+        choice = 9;
+    }
+    else if (pchoice == "10")
+    {
+        choice = 10;
+    }
+    else if (pchoice == "11")
+    {
+        choice = 11;
+    }
+    else if (pchoice == "12")
+    {
+        choice = 12;
+    }
+    else if (pchoice == "13")
+    {
+        choice = 13;
+    }
+    else if (pchoice == "14")
+    {
+        choice = 14;
+    }
+    else
+    {
+        cout << "Please enter a valid option number 0-14.\n";
+    }
     if (choice == 0)
     {
         cout << "0: Exit, 1: Enter a New Matrix, 2: Read Matrix from File\n";
@@ -437,10 +502,6 @@ void Matrix::menu()
             addToList(C);
             cout << "Product added to position " << matrixMenu.size() << endl;
         }
-    }
-    else
-    {
-        cout << "Please enter a valid option number 0-14.\n";
     }
     cout << endl;
     menu();
