@@ -15,7 +15,7 @@ int Matrix::vectorPosition(vector<Matrix> matrixMenu, vector<int> numMenu)
     while (found == false)
     {
         cout << "Please enter the number position.\n";
-        cin >> number;
+        number = numEntry();
         for (int i = 0; i < numMenu.size(); i ++)
         {   
             if (numMenu[i] == number)
@@ -60,6 +60,7 @@ bool Matrix::ynResponse()
         {
             return false;
         }
+        cout << "Invalid response.\n";
     }
 }
 
@@ -222,7 +223,7 @@ bool Matrix::invertible()
 {
     if (width != height)
     {
-        cout << "Width != height.\n";
+        cout << "Width != height\n";
         return false;
     }
     double det = characteristic();
@@ -288,88 +289,25 @@ vector<vector<double> > Matrix::rref()
 
 void Matrix::menu()
 {
-    string pchoice;
     int choice;
     bool existing;
     int position;
     char response;
     double constant;
     double tr;
-    cout << "Please select your desired matrix option:\n";
-    cout << "Press 0 to view menu.\n";
-    cin >> pchoice;
-    if (pchoice == "0")
-    {
-        choice = 0;
-    }
-    if (pchoice == "1")
-    {
-        choice = 1;
-    }
-    else if (pchoice == "2")
-    {
-        choice = 2;
-    }
-    else if (pchoice == "3")
-    {
-        choice = 3;
-    }
-    else if (pchoice == "4")
-    {
-        choice = 4;
-    }
-    else if (pchoice == "5")
-    {
-        choice = 5;
-    }
-    else if (pchoice == "6")
-    {
-        choice = 6;
-    }
-    else if (pchoice == "7")
-    {
-        choice = 7;
-    }
-    else if (pchoice == "8")
-    {
-        choice = 8;
-    }
-    else if (pchoice == "9")
-    {
-        choice = 9;
-    }
-    else if (pchoice == "10")
-    {
-        choice = 10;
-    }
-    else if (pchoice == "11")
-    {
-        choice = 11;
-    }
-    else if (pchoice == "12")
-    {
-        choice = 12;
-    }
-    else if (pchoice == "13")
-    {
-        choice = 13;
-    }
-    else if (pchoice == "14")
-    {
-        choice = 14;
-    }
-    else
-    {
-        cout << "Please enter a valid option number 0-14.\n";
-    }
+    bool esc = false;
+    cout << "Please select your desired matrix option,\n";
+    cout << "or press 0 to view menu:\n";
+    choice = strChoice();
     if (choice == 0)
     {
         cout << "0: Exit, 1: Enter a New Matrix, 2: Read Matrix from File\n";
         cout << "3: Display, 4: Get Dimensions, 5: Scale by Constant\n";
         cout << "6: Find Determinant, 7: Find Eigenvalues and Eigenvectors\n";
-        cout << "8: Invert, 9: Transpose, 10: Find Trace, 11: Solve";
+        cout << "8: Invert, 9: Transpose, 10: Find Trace, 11: Solve\n";
         cout << "12: Add, 13: Subtract, 14: Cross-Multiply\n";
-        cin >> choice;
+        cout << "Press the X key at any time to go back.\n";
+        choice = strChoice();
     }
     vector<vector<double> > tempData;
     vector<double> tempVector;
@@ -409,7 +347,7 @@ void Matrix::menu()
         if (choice == 5)
         {
             cout << "Please enter the constant.\n";
-            cin >> constant;
+            constant = numEntry();
             Matrix C = A.scale(constant);
             addToList(C);
         }
@@ -437,9 +375,12 @@ void Matrix::menu()
         {
             Matrix C = A.invert();
             cout << endl;
-            cout << "Inverse:\n";
-            C.printMatrix();
-            addToList(C);
+            if (C.getHeight() > 0)
+            {
+                cout << "Inverse:\n";
+                C.printMatrix();
+                addToList(C);
+            }
         }
         if (choice == 9)
         {
@@ -692,4 +633,66 @@ void Matrix::printEigenVec()
         }
         cout << endl;
     }
+}
+
+int Matrix::strChoice()
+{
+    string sc;
+    int choice;
+    cin >> sc;
+    if ((sc == "0") || (sc == "1") || (sc == "2") || (sc == "3") || (sc == "4")
+        || (sc == "5") || (sc == "6") || (sc == "7") || (sc == "8") || (sc == "9")
+        || (sc == "10") || (sc == "11") || (sc == "12") || (sc == "13") || (sc == "1"))
+    {
+        choice = stoi(sc);
+    }
+    else if ((sc == "X") || (sc == "x"))
+    {
+        choice = -1;
+    }
+    else
+    {
+        cout << "Please enter a valid option number 0-14, or the X key.\n";
+        choice = strChoice();
+    }
+    return choice;
+}
+
+bool Matrix::xKey(string key)
+{
+    bool xKey = false;
+    if ((key == "X") || (key == "x"))
+    {
+        xKey = true;
+    }
+    return xKey;
+}
+
+int Matrix::numEntry()
+{
+    string num;
+    string n;
+    bool isNum = true;
+    int retNum;
+    // Make sure number entry is actually an integer
+    do
+    {
+        cin >> num;
+        for (int i = 0; i < n.length(); i++)
+        {
+            n = num[i];
+            if ((n != "0") && (n != "1") && (n != "2") && (n != "3") && (n != "4")
+                && (n != "5") && (n != "6") && (n != "7") && (n != "8") && (n != "9"))
+            {
+                isNum = false;
+            }
+        }
+        if (isNum == false)
+        {
+            cout << "Please enter a number\n";
+        }
+    }
+    while (isNum == false);
+    retNum = stoi(num);
+    return retNum;
 }

@@ -63,6 +63,9 @@ public:
     vector<vector<double> > identity(double factor);
     bool compareQR();
     void printEigenVec();
+    int strChoice();
+    bool xKey(string key = "");
+    int numEntry();
 private:
     vector<vector<double> > matrix;
     string name;

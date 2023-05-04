@@ -134,9 +134,9 @@ Matrix::Matrix()
         norm = 0;
         valid = true;
         cout << "Please enter a height:\n";
-        cin >> height;
+        height = numEntry();
         cout << "Please enter a width:\n";
-        cin >> width;
+        width = numEntry();
         cout << "Please enter a valid " << height << "×" << width << " matrix,\n";
         cout << "separated by single spaces and enters:\n";
         getline(cin, line);
