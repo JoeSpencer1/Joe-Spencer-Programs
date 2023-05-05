@@ -15,7 +15,7 @@ int Matrix::vectorPosition(vector<Matrix> matrixMenu, vector<int> numMenu)
     while (found == false)
     {
         cout << "Please enter the number position.\n";
-        number = numEntry();
+        number = intEntry();
         for (int i = 0; i < numMenu.size(); i ++)
         {   
             if (numMenu[i] == number)
@@ -24,10 +24,15 @@ int Matrix::vectorPosition(vector<Matrix> matrixMenu, vector<int> numMenu)
                 found = true;
                 cout << "Matrix " << numMenu[i] << " successfully found.\n";
             }
+            else if (number == 0)
+            {
+                return 0;
+            }
         }
         if (found == false)
         {
             cout << "Sorry, there is not any matrix at this index.\n";
+            cout << "Press 0 to escape.\n";
         }
         cin.clear();
     }
@@ -148,9 +153,14 @@ string Matrix::findName()
     {
         test.close();
         cout << "Please enter a valid name.\n";
+        cout << "Enter 0 to escape.\n";
         cin >> name;
         name = longName(name);
         test.open(name);
+        if (name == "Matrix0.txt")
+        {
+            return name;
+        }
     }
     test.close();
     return name;
@@ -347,7 +357,7 @@ void Matrix::menu()
         if (choice == 5)
         {
             cout << "Please enter the constant.\n";
-            constant = numEntry();
+            constant = decEntry();
             Matrix C = A.scale(constant);
             addToList(C);
         }
@@ -658,17 +668,7 @@ int Matrix::strChoice()
     return choice;
 }
 
-bool Matrix::xKey(string key)
-{
-    bool xKey = false;
-    if ((key == "X") || (key == "x"))
-    {
-        xKey = true;
-    }
-    return xKey;
-}
-
-int Matrix::numEntry()
+int Matrix::intEntry()
 {
     string num;
     string n;
@@ -694,5 +694,42 @@ int Matrix::numEntry()
     }
     while (isNum == false);
     retNum = stoi(num);
+    return retNum;
+}
+
+double Matrix::decEntry()
+{
+    string num;
+    string n;
+    int counter = 0;
+    bool isNum = true;
+    double retNum;
+    // Make sure number entry is actually an integer
+    do
+    {
+        cin >> num;
+        for (int i = 0; i < n.length(); i++)
+        {
+            n = num[i];
+            if ((n != "0") && (n != "1") && (n != "2") && (n != "3") && (n != "4")
+                && (n != "5") && (n != "6") && (n != "7") && (n != "8") && (n != "9"))
+            {
+                if ((n == ".") && (counter < 1))
+                {
+                    counter ++;
+                }
+                else
+                {
+                    isNum = false;
+                }
+            }
+        }
+        if (isNum == false)
+        {
+            cout << "Please enter a number\n";
+        }
+    }
+    while (isNum == false);
+    retNum = stod(num);
     return retNum;
 }

@@ -64,8 +64,8 @@ public:
     bool compareQR();
     void printEigenVec();
     int strChoice();
-    bool xKey(string key = "");
-    int numEntry();
+    int intEntry();
+    double decEntry();
 private:
     vector<vector<double> > matrix;
     string name;

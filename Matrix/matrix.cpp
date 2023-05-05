@@ -25,9 +25,17 @@ Matrix::Matrix(string fileName)
     {   
         cout << "Please enter the name of a matrix file contained in this folder.\n";
         cin >> fileName;
+        if (fileName == "0")
+        {
+            break;
+        }
         fileName = longName(fileName);
         fileName = fileName;
         readMatrix.open(fileName);
+        if (!readMatrix.is_open())
+        {
+            cout << "Enter 0 to exit if necessary.\n";
+        }
     }
     checkValidity(readMatrix);
     readMatrix >> height;
@@ -134,9 +142,9 @@ Matrix::Matrix()
         norm = 0;
         valid = true;
         cout << "Please enter a height:\n";
-        height = numEntry();
+        height = intEntry();
         cout << "Please enter a width:\n";
-        width = numEntry();
+        width = intEntry();
         cout << "Please enter a valid " << height << "×" << width << " matrix,\n";
         cout << "separated by single spaces and enters:\n";
         getline(cin, line);
