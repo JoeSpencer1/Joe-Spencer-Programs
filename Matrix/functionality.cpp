@@ -493,6 +493,12 @@ Matrix Matrix::getMatrix(string number)
     if (existing == true)
     {
         int position = vectorPosition(matrixMenu, numMenu);
+        if (position == 0)
+        {
+            cout << "Exiting.\n";
+            vector<vector<double> > blankMatrix;
+            return Matrix(0, 0, blankMatrix);
+        }
         Matrix A = matrixMenu[position];
         return A;
     }

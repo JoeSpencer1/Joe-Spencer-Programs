@@ -804,8 +804,10 @@ void Matrix::QR(int n, Matrix Ea)
         if ((i < (height - 1)) && ((Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i + 1][i]) > (accuracy * accuracy)))
         {
             double a = Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i + 1][i];
-            double b = Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i + 1][i];
-            temError = (a - b) * (a - b);
+            double b = Ea.getMatrix()[i][i] * Ea.getMatrix()[i + 1][i + 1];
+            double c = Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i + 1][i];
+            double d = Eb.getMatrix()[i][i] * Eb.getMatrix()[i + 1][i + 1];
+            temError = (c - d) - (a - b);
             temError = temError * temError;
             i++;            
         }
@@ -819,7 +821,14 @@ void Matrix::QR(int n, Matrix Ea)
             error += temError * height;
         }
     }
-    if (error < accuracy * accuracy * accuracy * height)
+    double complex = 0;
+    for (int i = 1; i < height; i++)
+    {
+        complex += Eb.getMatrix()[i][i - 1] * Eb.getMatrix()[i][i - 1];
+    }
+    complex = sqrt(complex) / height;
+    if (((complex < accuracy) && (error < accuracy * accuracy * accuracy * height)) || 
+        ((complex > accuracy) && (error < accuracy * height)))
     {
         n--;
         error = 0;
