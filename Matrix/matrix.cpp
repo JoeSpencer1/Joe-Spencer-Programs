@@ -1018,7 +1018,7 @@ void Matrix::eigenVecs()
                 }
             }
         }
-        // Algebraically solve BaaB
+        // Algebraically diagonalize BaaB
         for (int j = 0; j < (height * 2); j++)
         {
             factor1 = BaaB[j][j];
@@ -1060,15 +1060,21 @@ void Matrix::eigenVecs()
         tEigenv[bottom] = 1;
         for (int j = bottom - 1; j >= 0; j--)
         {
-            factor2 = BaaB[j][bottom] / BaaB[bottom][bottom];
-            tEigenv[j] -= factor2;
+            factor2 = 0;
+            for (int k = bottom; k > j; k--)
+            {
+                factor2 -= tEigenv[k] * BaaB[j][k];
+            }
+            tEigenv[j] = factor2 / BaaB[j][j];
+//            factor2 = BaaB[j][bottom] / BaaB[bottom][bottom];
+//            tEigenv[j] -= factor2;
 //            for (int k = 0; k < width * 2; k++)
 //            {
 //                BaaB[j][k] -= BaaB[bottom][k] * factor2;
 //                tEigenv[k] -= factor2 * BaaB[k][bottom];
 //            }
         }
-        // Algebraically solve for other entries of eigenvector.
+/*        // Algebraically solve for other entries of eigenvector.
         for (int j = bottom - 1; j >= 0; j--)
         {
             factor1 = BaaB[j][j];
@@ -1086,7 +1092,7 @@ void Matrix::eigenVecs()
 //                    }
                 }
             }
-        }
+        }*/
 for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
 //for(int i = 0; i < height * 2; i++){cout << order[i] << " ";}cout<<endl;
         // Create real and complex eigenvectors
