@@ -819,11 +819,7 @@ cout << accuracy << " " << trace() << " " << height << " " << accuracy * determi
 cout << "Here: " << Ea.getMatrix()[i + 1][i] << endl;
 double a = (Ea.getMatrix()[i][i] * Ea.getMatrix()[i + 1][i + 1]) - (Ea.getMatrix()[i + 1][i] * Ea.getMatrix()[i][i + 1]);
 double b = (Eb.getMatrix()[i][i] * Eb.getMatrix()[i + 1][i + 1]) - (Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i][i + 1]);
-temError = (a - b);
-if (temError < 0)
-{
-    temError *= -1;
-}
+temError = (a - b) * (a - b);
 //            temError = temError * temError;
 //cout << "temError = " << temError << "\n";
             i++;            
