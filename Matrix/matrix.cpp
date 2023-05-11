@@ -695,7 +695,7 @@ void Matrix::eigenValues()
     QR(height - 1, A);
     for (int i = 0; i < height; i++)
     {
-        if ((i < height - 1) && ((E[i + 1][i] > accuracy) || (E[i + 1][i] < 0 - accuracy)))
+        if ((i < height - 1) && ((E[i + 1][i] > accuracy * height) || (E[i + 1][i] < 0 - accuracy * height)))
         {
             poly = polynomial(i);
             real = poly[0];
@@ -801,14 +801,31 @@ void Matrix::QR(int n, Matrix Ea)
     tempQ.clear();
     for (int i = 0; i < height; i++)
     {
-        if ((i < (height - 1)) && ((Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i + 1][i]) > (accuracy * accuracy)))
+        if ((i < (height - 1)) && ((Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i + 1][i]) > (accuracy * height)))
         {
-            double a = Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i + 1][i];
+/*            double a = Ea.getMatrix()[i][i + 1] * Ea.getMatrix()[i + 1][i];
             double b = Ea.getMatrix()[i][i] * Ea.getMatrix()[i + 1][i + 1];
             double c = Eb.getMatrix()[i][i + 1] * Eb.getMatrix()[i + 1][i];
             double d = Eb.getMatrix()[i][i] * Eb.getMatrix()[i + 1][i + 1];
-            temError = (c - d) - (a - b);
-            temError = temError * temError;
+            temError = (d - c) - (b - a);
+*/
+/*
+cout << "Ea: "; Ea.printMatrix(); cout<<"Eb: "; Eb.printMatrix();
+double a = (Ea.getMatrix()[i][i] + Ea.getMatrix()[i + 1][i + 1]);
+double b = (Eb.getMatrix()[i][i] + Eb.getMatrix()[i + 1][i + 1]);
+temError = a - b;
+*/
+cout << accuracy << " " << trace() << " " << height << " " << accuracy * determinant() * height << " ";
+cout << "Here: " << Ea.getMatrix()[i + 1][i] << endl;
+double a = (Ea.getMatrix()[i][i] * Ea.getMatrix()[i + 1][i + 1]) - (Ea.getMatrix()[i + 1][i] * Ea.getMatrix()[i][i + 1]);
+double b = (Eb.getMatrix()[i][i] * Eb.getMatrix()[i + 1][i + 1]) - (Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i][i + 1]);
+temError = (a - b);
+if (temError < 0)
+{
+    temError *= -1;
+}
+//            temError = temError * temError;
+//cout << "temError = " << temError << "\n";
             i++;            
         }
         else
@@ -818,9 +835,10 @@ void Matrix::QR(int n, Matrix Ea)
         error += temError;
         if (temError > accuracy)
         {
-            error += temError * height;
+            error += temError / height;
         }
     }
+//cout << error << " " << accuracy * height << endl;
     double complex = 0;
     for (int i = 1; i < height; i++)
     {
@@ -828,7 +846,7 @@ void Matrix::QR(int n, Matrix Ea)
     }
     complex = sqrt(complex) / height;
     if (((complex < accuracy) && (error < accuracy * accuracy * accuracy * height)) || 
-        ((complex > accuracy) && (error < accuracy * height)))
+        ((complex >= accuracy * height) && (error < accuracy * accuracy * accuracy * height)))
     {
         n--;
         error = 0;
@@ -866,6 +884,7 @@ void Matrix::QR(int n, Matrix Ea)
             return;
         }
     }
+    Eb.printMatrix();
     QR(n, Eb);
 }
 
@@ -946,7 +965,6 @@ void Matrix::eigenVecs()
     double factor2;
     for (int i = 0; i < height; i++)
     {
-//for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Construct BaaB matrix
         for (int j = 0; j < (height * 2); j++)
         {
@@ -959,6 +977,7 @@ void Matrix::eigenVecs()
                 {
                     if (k == j)
                     {
+cout << "img[i] = " << imaginaryEigen[i] << "\n";
                         tempRow.push_back(imaginaryEigen[i]);
                     }
                     if (k == j + width)
@@ -989,7 +1008,6 @@ void Matrix::eigenVecs()
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
-//for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Rearrange BaaB so it does not have any zero entries down its main diagonal.
         if (imaginaryEigen[i] == 0)
         {
@@ -1043,6 +1061,7 @@ void Matrix::eigenVecs()
                 }
             }
         }
+//for (int i = 0; i < imaginaryEigen.size(); i++){cout << i << " " << imaginaryEigen[i] << endl;}
 //for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
         bottom = height * 2 - 1;
@@ -1102,7 +1121,7 @@ void Matrix::eigenVecs()
                 }
             }
         }*/
-for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
+//for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
 //for(int i = 0; i < height * 2; i++){cout << order[i] << " ";}cout<<endl;
         // Create real and complex eigenvectors
         for (int j = 0; j < height * 2; j++)
@@ -1145,4 +1164,32 @@ for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j
         BaaB.clear();
     }
     return;
+}
+
+double Matrix::l2norm()
+{
+    double norm = 0;
+    if (matrix[0].size() == 1)
+    {
+        for (int i = 0; i < matrix.size(); i++)
+        {
+            norm += matrix[i][0] * matrix[i][0];
+        }
+        norm = sqrt(norm);
+    }
+    else
+    {
+        Matrix A = Matrix(height, width, matrix);
+        Matrix A2 = A.cross(A.transpose(), false);
+        vector<vector<double> > normV = A2.returnEigen();
+        for (int i = 0; i < normV[0].size(); i++)
+        {
+            if ((normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]) > norm)
+            {
+                norm = (normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]);
+            }
+            norm = sqrt(norm);
+        }
+    }
+    return norm;
 }

@@ -33,6 +33,7 @@ public:
     void eigen1x1();
     void eigen2x2();
     void eigenVecs();
+    double l2norm();
     // These are more of overhead functions for the program.
     void menu();
     void publishFile();
@@ -55,7 +56,6 @@ public:
     string getName();
     void addToList(Matrix A);
     Matrix getMatrix(string number);
-    vector<double> complexRoot(double real, double imag, int pow);
     string longName(string shortName);
     Matrix householder();
     void setMatrix(vector<vector<double> > toSet);
@@ -66,6 +66,7 @@ public:
     int strChoice();
     int intEntry();
     double decEntry();
+    vector<vector<double> > returnEigen();
 private:
     vector<vector<double> > matrix;
     string name;

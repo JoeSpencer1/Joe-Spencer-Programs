@@ -305,6 +305,7 @@ void Matrix::menu()
     char response;
     double constant;
     double tr;
+    double l2n;
     bool esc = false;
     cout << "Please select your desired matrix option,\n";
     cout << "or press 0 to view menu:\n";
@@ -314,9 +315,9 @@ void Matrix::menu()
         cout << "0: Exit, 1: Enter a New Matrix, 2: Read Matrix from File\n";
         cout << "3: Display, 4: Get Dimensions, 5: Scale by Constant\n";
         cout << "6: Find Determinant, 7: Find Eigenvalues and Eigenvectors\n";
-        cout << "8: Invert, 9: Transpose, 10: Find Trace, 11: Solve\n";
-        cout << "12: Add, 13: Subtract, 14: Cross-Multiply\n";
-        cout << "Press the X key at any time to go back.\n";
+        cout << "8: Invert, 9: Transpose, 10: Find Trace, 11: Find L2 norm\n";
+        cout << "12: Solve, 13: Add, 14: Subtract, 15: Cross-Multiply\n";
+        cout << "Press the X key to go back.\n";
         choice = strChoice();
     }
     vector<vector<double> > tempData;
@@ -342,7 +343,7 @@ void Matrix::menu()
         cout << "New matrix stored at position " << numMenu[matrixMenu.size() - 1] << ".\n";
     }
     // One Matrix
-    if ((choice > 2) && (choice < 11))
+    if ((choice > 2) && (choice < 12))
     {
         Matrix A = getMatrix("1");
         if (choice == 3)
@@ -405,13 +406,18 @@ void Matrix::menu()
             tr = A.trace();
             cout << "Trace = " << tr << endl;
         }
+        if (choice == 11)
+        {
+            l2n = A.l2norm();
+            cout << "L2 norm = " << l2n << endl;
+        }
     }
     // 2 Matrices
-    if ((choice > 9) && (choice < 15))
+    if ((choice > 11) && (choice < 16))
     {
         Matrix A = getMatrix("1");
         Matrix B = getMatrix("2");
-        if (choice == 11)
+        if (choice == 12)
         {
             if ((A.getHeight() != A.getWidth()) || (A.getHeight() != B.getHeight()) || (B.getWidth() != 1))
             {
@@ -432,21 +438,21 @@ void Matrix::menu()
                 }
             }
         }
-        if (choice == 12)
+        if (choice == 13)
         {
             Matrix C = A.add(B);
             C.printMatrix();
             addToList(C);
             cout << "Sum added to position " << matrixMenu.size() << endl;
         }
-        if (choice == 13)
+        if (choice == 14)
         {
             Matrix C = A.subtract(B);
             C.printMatrix();
             addToList(C);
             cout << "Difference added to position " << matrixMenu.size() << endl;
         }
-        if (choice == 14)
+        if (choice == 15)
         {
             Matrix C = A.cross(B, true);
             C.printMatrix();
@@ -463,7 +469,7 @@ vector<double> Matrix::polynomial(int row)
     vector<double> polynomial;
     double real;
     double imaginary;
-    double a = 1.0;
+    double a = 1;
     double b = -1 * (E[row][row] + E[row + 1][row + 1]);
     double c = E[row][row] * E[row + 1][row + 1] - E[row + 1][row] * E[row][row + 1];
     polynomial.push_back(-1 * b / (2 * a));
@@ -738,4 +744,13 @@ double Matrix::decEntry()
     while (isNum == false);
     retNum = stod(num);
     return retNum;
+}
+
+vector<vector<double> > Matrix::returnEigen()
+{
+    eigenValues();
+    vector<vector<double> > eigenV;
+    eigenV.push_back(realEigen);
+    eigenV.push_back(imaginaryEigen);
+    return(eigenV);
 }
