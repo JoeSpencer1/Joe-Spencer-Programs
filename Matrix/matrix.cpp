@@ -1039,25 +1039,23 @@ void Matrix::eigenVecs()
                 }
             }
         }
-//for (int i = 0; i < imaginaryEigen.size(); i++){cout << i << " " << imaginaryEigen[i] << endl;}
-//for (int i = 0; i < height * 2; i++){cout << BaaB[i].size() << "\t\t";for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
         bottom = height * 2 - 1;
-cout << "Before1\n";
-for (int i = 0; i < BaaB.size(); i++){for (int j = 0; j < BaaB.size(); j++){cout << BaaB[i][j] << " ";}cout<<endl;}
+for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<BaaB[j][i]<<" ";}cout<<"\n";}
         while ((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance)))
         {
-cout << "Before2\n";
-            for (int j = 0; j < (height * 2); j++)
-            {
-//cout << bottom << " Before3\n";
-                BaaB[j][bottom] = 0;
-            }
             bottom --;
             if (bottom < 0)
             {
                 bottom = height * 2 - 1;
                 break;
+            }
+        }
+        for (int j = height * 2; j > bottom; j--)
+        {
+            for (int k = 0; k < (height * 2); k++)
+            {
+                BaaB[k][j] = 0;
             }
         }
         // Put in value for starting eigenvectors
@@ -1081,7 +1079,7 @@ cout << "Before2\n";
                 factor2 -= tEigenv[k] * BaaB[j][k];
             }
             tEigenv[j] = factor2 / BaaB[j][j];
-cout << j << " " << tEigenv[j] << endl;
+cout << j << " " << BaaB[j][j] << endl;
 //            factor2 = BaaB[j][bottom] / BaaB[bottom][bottom];
 //            tEigenv[j] -= factor2;
 //            for (int k = 0; k < width * 2; k++)
@@ -1090,7 +1088,6 @@ cout << j << " " << tEigenv[j] << endl;
 //                tEigenv[k] -= factor2 * BaaB[k][bottom];
 //            }
         }
-cout << "done\n";
 /*        // Algebraically solve for other entries of eigenvector.
         for (int j = bottom - 1; j >= 0; j--)
         {
