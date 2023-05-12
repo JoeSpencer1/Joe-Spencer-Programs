@@ -67,6 +67,7 @@ public:
     int intEntry();
     double decEntry();
     vector<vector<double> > returnEigen();
+    vector<vector<double> > normalizeBottom(vector<double> real, vector<double> imag);
 private:
     vector<vector<double> > matrix;
     string name;

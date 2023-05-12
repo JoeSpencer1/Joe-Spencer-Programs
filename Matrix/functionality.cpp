@@ -754,3 +754,24 @@ vector<vector<double> > Matrix::returnEigen()
     eigenV.push_back(imaginaryEigen);
     return(eigenV);
 }
+
+vector<vector<double> > Matrix::normalizeBottom(vector<double> real, vector<double> imag)
+{
+    int last = real.size() - 1;
+    double rEnd = 0;
+    double iEnd = 0;
+    while ((rEnd == 0) && (iEnd == 0))
+    {
+        rEnd = real[last];
+        iEnd = imag[last];
+        last --;
+    }
+    if (iEnd != 0)
+    {
+        // Divide by a complex number
+        for (int i = 0; i <= last; i++)
+        {
+            
+        }
+    }
+}

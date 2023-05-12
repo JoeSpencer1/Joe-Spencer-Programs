@@ -919,18 +919,11 @@ void Matrix::eigenVecs()
     (A-aI)yr-bIyi=0, (A-aI)yi+bIyr=0
     If you make a 2n*2n matrix you can solve this. It looks like this:
 
-    [A-aI     -bi] [vr ] =  [0]
-    [b    (A-aI)i] [vii]    [0]   This means that
+    [A-aI     -b] [vr]  =  [0]
+    [b    (A-aI)] [vi]     [0]   or:
 
-    [A-aI      b] [vr]  =  [0] 
-    [b      A-ai] [vi]     [0]    or:
-
-    [b      A-ai] [vi]  =  [0]
+    [-b     A-ai] [vi]  =  [0]
     [A-ai      b] [vr]     [0]
-
-    Eigenvectors for the first case should be [1.50338, 2.11671, 2.8933, 1], 
-    [-0.309574, -0.110989, -0.95844, 1], [-0.120387, 0.163608, 1.35782, 1],
-    [-2.51515, 2.18569, -1.75811, 1]
     */
     vector<vector<double> > BaaB;
     vector<double> rEigenv;
@@ -956,7 +949,7 @@ void Matrix::eigenVecs()
                 {
                     if (k == j)
                     {
-                        tempRow.push_back(imaginaryEigen[i]);
+                        tempRow.push_back(-1 * imaginaryEigen[i]);
                     }
                     if (k == j + width)
                     {
@@ -1070,6 +1063,7 @@ for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<B
             tEigenv.push_back(0);
         }
         // Set bottom entry of eigenvector set equal to 1 whether real or imaginary
+cout <<"Bottom = " << bottom << "\n";
         tEigenv[bottom] = 1;
         for (int j = bottom - 1; j >= 0; j--)
         {
@@ -1080,35 +1074,7 @@ for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<B
             }
             tEigenv[j] = factor2 / BaaB[j][j];
 cout << j << " " << BaaB[j][j] << endl;
-//            factor2 = BaaB[j][bottom] / BaaB[bottom][bottom];
-//            tEigenv[j] -= factor2;
-//            for (int k = 0; k < width * 2; k++)
-//            {
-//                BaaB[j][k] -= BaaB[bottom][k] * factor2;
-//                tEigenv[k] -= factor2 * BaaB[k][bottom];
-//            }
         }
-/*        // Algebraically solve for other entries of eigenvector.
-        for (int j = bottom - 1; j >= 0; j--)
-        {
-            factor1 = BaaB[j][j];
-            tEigenv[j] = tEigenv[j] / factor1;
-            if ((factor1 > accuracy) || (factor1 < (0 - accuracy)))
-            {
-                for (int k = j - 1; k >= 0; k--)
-                {
-                    factor2 = BaaB[k][j] / factor1;
-                    tEigenv[k] -= factor2 * tEigenv[j];
-//                    for (int l = 0; l < 2 * width; l++)
-//                    {
-//                        BaaB[k][l] -= factor2 * BaaB[j][l];
-//                        tEigenv[k] -= factor2 * BaaB[j][j];
-//                    }
-                }
-            }
-        }*/
-//for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
-//for(int i = 0; i < height * 2; i++){cout << order[i] << " ";}cout<<endl;
         // Create real and complex eigenvectors
         for (int j = 0; j < height * 2; j++)
         {
