@@ -757,25 +757,37 @@ vector<vector<double> > Matrix::returnEigen()
 
 vector<vector<double> > Matrix::normalizeBottom(vector<double> real, vector<double> imag)
 {
-    int last = real.size() - 1;
+    int last = real.size();
     double rEnd = 0;
     double iEnd = 0;
-    double tReal;
-    double tImag;
+    double rEnt;
+    double iEnt;
+    double factor;
+    vector<vector<double> > newVecs;
     while ((rEnd == 0) && (iEnd == 0))
     {
-        rEnd = real[last];
-        iEnd = imag[last];
         last --;
+        rEnd = real[last];
+        iEnd = imag[last] * -1;
     }
     if (iEnd != 0)
     {
-        // Divide by a complex number
+        // Multiply each entry by the factor you found
         for (int i = 0; i <= last; i++)
         {
-            tReal = real[i] / rEnd;
-            tImag = 0 - real[i] / iEnd;
-            
+            rEnt = real[i] * rEnd - imag[i] * iEnd;
+            iEnt = real[i] * iEnd + imag[i] * rEnd;
+            real[i] = rEnt;
+            imag[i] = iEnt;
         }
     }
+    factor = real[last];
+    for (int i = 0; i < last; i++)
+    {
+        real[i] /= factor;
+        imag[i] /= factor;
+    }
+    newVecs.push_back(real);
+    newVecs.push_back(imag);
+    return (newVecs);
 }

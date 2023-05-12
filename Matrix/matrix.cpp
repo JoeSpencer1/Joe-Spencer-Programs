@@ -1107,8 +1107,9 @@ cout << j << " " << BaaB[j][j] << endl;
             cEigenv[j] /= factor1;
 //            cout << rEigenv[j] << ' ' << cEigenv[j] << '\n';
         }
-        realEigenVectors.push_back(rEigenv);
-        imaginaryEigenVectors.push_back(cEigenv);
+        vector<vector<double> > eigenV = normalizeBottom(rEigenv, cEigenv);
+        realEigenVectors.push_back(eigenV[0]);
+        imaginaryEigenVectors.push_back(eigenV[1]);
         tempRow.clear();
         order.clear();
         rEigenv.clear();
