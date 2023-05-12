@@ -760,6 +760,8 @@ vector<vector<double> > Matrix::normalizeBottom(vector<double> real, vector<doub
     int last = real.size() - 1;
     double rEnd = 0;
     double iEnd = 0;
+    double tReal;
+    double tImag;
     while ((rEnd == 0) && (iEnd == 0))
     {
         rEnd = real[last];
@@ -771,6 +773,8 @@ vector<vector<double> > Matrix::normalizeBottom(vector<double> real, vector<doub
         // Divide by a complex number
         for (int i = 0; i <= last; i++)
         {
+            tReal = real[i] / rEnd;
+            tImag = 0 - real[i] / iEnd;
             
         }
     }
