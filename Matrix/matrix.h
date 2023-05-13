@@ -17,25 +17,25 @@ public:
     ~Matrix();
     // These functions are all useful matrix operations.
     Matrix add(Matrix Other);
-    Matrix subtract(Matrix Other);
-    Matrix scale(double constant);
-    Matrix cross(Matrix Other, bool keep);
     double characteristic();
-    Matrix invert();
-    Matrix transpose();
-    double determinant();
-    double determinant(vector<vector<double> > toDetermine);
-    void solve(Matrix solution);
-    bool invertible();
-    double trace();
+    double determinant(vector<vector<double> > toDetermine, int column, int row);
     void eigenValues();
-    void QR(int n, Matrix Ea);
+    void eigenVecs();
     void eigen1x1();
     void eigen2x2();
-    void eigenVecs();
+    Matrix invert();
+    bool invertible();
+    Matrix cross(Matrix Other, bool keep);
     double l2norm();
+    void QR(int n, Matrix Ea);
+    Matrix scale(double constant);
+    void solve(Matrix solution);
+    Matrix subtract(Matrix Other);
+    double trace();
+    Matrix transpose();
     // These are more of overhead functions for the program.
     void menu();
+    double determinant();
     void publishFile();
     vector<double> polynomial(int row);
     bool checkCompatibility(Matrix Other);
@@ -68,6 +68,7 @@ public:
     double decEntry();
     vector<vector<double> > returnEigen();
     vector<vector<double> > normalizeBottom(vector<double> real, vector<double> imag);
+    vector<vector<double> > multiplicity(vector<vector<double> > BaaB, int n);
 private:
     vector<vector<double> > matrix;
     string name;

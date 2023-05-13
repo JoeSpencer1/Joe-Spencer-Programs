@@ -375,12 +375,23 @@ void Matrix::menu()
         }
         if (choice == 7)
         {
-            A.eigenValues();
-            cout << "\nEigenvalues:\n";
-            A.printEigen();
-            A.eigenVecs();
-            cout << "\nEigenvectors:\n";
-            A.printEigenVec();
+cout<<"1\n";
+            if ((A.getHeight() == 0) || (A.getHeight() != A.getWidth()) || (A.determinant() == 0))
+            {
+                cout << "Must be a square invertible matrix.\n";
+            }
+            else
+            {
+                A.eigenValues();
+                cout << "\nEigenvalues:\n";
+cout<<"2\n";
+                A.printEigen();
+cout<<"3\n";
+                A.eigenVecs();
+cout<<"4\n";
+                cout << "\nEigenvectors:\n";
+                A.printEigenVec();
+            }
         }
         if (choice == 8)
         {
@@ -790,4 +801,45 @@ vector<vector<double> > Matrix::normalizeBottom(vector<double> real, vector<doub
     newVecs.push_back(real);
     newVecs.push_back(imag);
     return (newVecs);
+}
+
+vector<vector<double> > Matrix::multiplicity(vector<vector<double> > BaaB, int n)
+{
+    vector<vector<double> > BaaB2 = BaaB;
+    vector<vector<double> > BaaB3 = BaaB;
+    double entry;
+    for (int i = 0; i < n; i++)
+    {
+        if ((realEigen[i] == realEigen[n]) && (imaginaryEigen[i] == imaginaryEigen[n]))
+        {
+            for (int j = 0; j < height; j++)
+            {
+                for (int k = 0; k < width; k++)
+                {
+                    entry = 0;
+                    for (int l = 0; l < height; l++)
+                    {
+                        entry += BaaB[j][l + width] * BaaB2[l + width][k];
+                        if (j == (l + width))
+                        {
+                            entry -= BaaB[j][l] * BaaB2[l][k];
+                        }
+                    }
+                    BaaB3[j][k + width] = entry;
+                    BaaB3[j + width][k] = entry;
+                    entry = 0;
+                    for (int l = 0; l < height; l++)
+                    {
+                        entry += BaaB[j + width][l] * BaaB2[l][k + width];
+                        entry += BaaB[j][l + width] * BaaB2[l + width][k];
+                    }
+                    BaaB3[j][k] = entry;
+                    BaaB3[j + width][k + width] = entry;
+                }
+            }
+        }
+        BaaB2 = BaaB3;
+    }
+for (int i = 0; i < height * 2; i ++){for(int j = 0; j < width * 2; j++){cout<<BaaB2[i][j]<<" ";}cout<<"\n";}
+    return BaaB2;
 }

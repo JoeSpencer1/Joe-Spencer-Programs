@@ -590,7 +590,7 @@ double Matrix::determinant()
             tempMatrix.push_back(temp);
             temp.clear();
         }
-        return determinant(tempMatrix);
+        return determinant(tempMatrix, 0, 0);
     }
     else
     {
@@ -599,7 +599,7 @@ double Matrix::determinant()
     }
 }
 
-double Matrix::determinant(vector<vector<double> > toDetermine)
+double Matrix::determinant(vector<vector<double> > toDetermine, int column, int row)
 {
     vector<vector<double> > nextDetermine;
     double temp;
@@ -692,7 +692,9 @@ void Matrix::eigenValues()
     vector<double> poly;
     double real = 0;
     double imaginary = 0;
+cout<<"a\n";
     QR(height - 1, A);
+cout<<"b\n";
     for (int i = 0; i < height; i++)
     {
         if ((i < height - 1) && ((E[i + 1][i] > accuracy * height) || (E[i + 1][i] < 0 - accuracy * height)))
