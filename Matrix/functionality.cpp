@@ -378,6 +378,11 @@ void Matrix::menu()
             A.eigenValues();
             cout << "Eigenvalues:\n";
             A.printEigen();
+for (int i = 0; i < height; i++)
+{
+    cout << imaginaryEigen[i] << " ";
+}
+cout<<endl;
             A.eigenVecs();
             cout << "Eigenvectors:\n";
             A.printEigenVec();
@@ -572,8 +577,8 @@ void Matrix::printEigen()
         if (imaginaryEigen[i] != 0)
         {
             cout << " + " << imaginaryEigen[i] << "i";
-            i++;
             cout << endl << realEigen[i] << " - " << imaginaryEigen[i] << "i";
+            i++;
         }
         cout << endl;
     }
