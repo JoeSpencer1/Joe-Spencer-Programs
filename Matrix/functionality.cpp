@@ -376,15 +376,10 @@ void Matrix::menu()
         if (choice == 7)
         {
             A.eigenValues();
-            cout << "Eigenvalues:\n";
+            cout << "\nEigenvalues:\n";
             A.printEigen();
-for (int i = 0; i < height; i++)
-{
-    cout << imaginaryEigen[i] << " ";
-}
-cout<<endl;
             A.eigenVecs();
-            cout << "Eigenvectors:\n";
+            cout << "\nEigenvectors:\n";
             A.printEigenVec();
         }
         if (choice == 8)
@@ -787,7 +782,7 @@ vector<vector<double> > Matrix::normalizeBottom(vector<double> real, vector<doub
         }
     }
     factor = real[last];
-    for (int i = 0; i < last; i++)
+    for (int i = 0; i <= last; i++)
     {
         real[i] /= factor;
         imag[i] /= factor;

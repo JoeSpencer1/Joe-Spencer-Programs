@@ -943,7 +943,6 @@ void Matrix::eigenVecs()
             order.push_back(j);
             for (int k = 0; k < (width * 2); k++)
             {
-                order.push_back(k);
                 if (((j < height) && (k < width)) || ((j >= height) && (k >= width)))
                 {
                     if (k == j)
@@ -978,8 +977,6 @@ void Matrix::eigenVecs()
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
-cout <<"BaaB0:\n";
-for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<"\n";}
         // Rearrange BaaB so it does not have any zero entries down its main diagonal.
         if (imaginaryEigen[i] == 0)
         {
@@ -1017,8 +1014,6 @@ for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<B
                 }
             }
         }
-cout <<"BaaB1:\n";
-for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<"\n";}
         // Algebraically diagonalize BaaB
         for (int j = 0; j < (height * 2); j++)
         {
@@ -1037,8 +1032,6 @@ for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<B
         }
         // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
         bottom = height * 2 - 1;
-cout <<"BaaB2:\n";
-for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<"\n";}
         while ((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance)))
         {
             bottom --;
@@ -1066,8 +1059,6 @@ for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<B
             tEigenv.push_back(0);
             tEigenv.push_back(0);
         }
-        // Set bottom entry of eigenvector set equal to 1 whether real or imaginary
-//cout <<"Bottom = " << bottom << "\n";
         tEigenv[bottom] = 1;
         for (int j = bottom - 1; j >= 0; j--)
         {
@@ -1077,10 +1068,7 @@ for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<B
                 factor2 -= tEigenv[k] * BaaB[j][k];
             }
             tEigenv[j] = factor2 / BaaB[j][j];
-cout << j << " " << BaaB[j][j] << endl;
         }
-cout<<"2nd: \n";
-for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<BaaB[i][j]<<" ";}cout<<"\n";}
         // Create real and complex eigenvectors
         for (int j = 0; j < height * 2; j++)
         {
@@ -1098,19 +1086,6 @@ for (int i = 0; i < height * 2; i++){for (int j = 0; j < width * 2; j++){cout<<B
         while ((rEigenv[bottom] == 0) && (cEigenv[bottom] == 0))
         {
             bottom--;
-        }
-        if ((rEigenv[bottom] > accuracy) || (rEigenv[bottom] < (0 - accuracy)))
-        {
-            factor1 = rEigenv[bottom];
-        }
-        else
-        {
-            factor1 = cEigenv[bottom];
-        }
-        for (int j = 0; j < height; j++)
-        {
-            rEigenv[j] /= factor1;
-            cEigenv[j] /= factor1;
         }
         vector<vector<double> > eigenV = normalizeBottom(rEigenv, cEigenv);
         realEigenVectors.push_back(eigenV[0]);
