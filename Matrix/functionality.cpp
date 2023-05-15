@@ -356,7 +356,7 @@ Matrix Matrix::retreiveMatrix(string number)
     if (existing == true)
     {
         int position = vectorPosition(matrixMenu, numMenu);
-        if (position == 0)
+        if (position < 0)
         {
             cout << "Exiting.\n";
             vector<vector<double> > blankMatrix;

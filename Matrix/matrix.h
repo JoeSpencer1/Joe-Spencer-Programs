@@ -10,12 +10,13 @@ using namespace std;
 class Matrix
 {
 public:
+    // These are the different ways a matrix can be created, stored in their own file.
     Matrix(string filename);
     Matrix(int rows, int columns, vector<vector<double> > data);
     Matrix(int rows, int columns, vector<vector<double> > data, bool keep);
     Matrix();
     ~Matrix();
-    // These functions are all useful matrix operations.
+    // These functions are useful matrix operations.
     Matrix add(Matrix Other);
     Matrix cross(Matrix Other, bool keep);
     double characteristic();
@@ -28,6 +29,7 @@ public:
     Matrix invert();
     bool invertible();
     double l2norm();
+    void QR(int n, Matrix Ea);
     Matrix scale(double constant);
     void solve(Matrix solution);
     Matrix subtract(Matrix Other);
@@ -59,7 +61,6 @@ public:
     void publishFile();
     void publishNew(int rows, int columns, vector<vector<double> > newMatrix);
     vector<double> polynomial(int row);
-    void QR(int n, Matrix Ea);
     vector<vector<double> > returnEigen();
     Matrix retreiveMatrix(string number);
     vector<vector<double> > rref();
