@@ -16,17 +16,21 @@ int Matrix::vectorPosition(vector<Matrix> matrixMenu, vector<int> numMenu)
     {
         cout << "Please enter the number position.\n";
         number = intEntry();
-        for (int i = 0; i < numMenu.size(); i ++)
+        for (int i = 0; i <= numMenu.size(); i ++)
         {   
-            if (numMenu[i] == number)
+            if (number > numMenu.size())
+            {
+                cout << "Current matrix menu length is " << numMenu.size() << endl;
+            }
+            else if (number == 0)
+            {
+                return -1;
+            }
+            else if (numMenu[i] == number)
             {
                 position = i;
                 found = true;
                 cout << "Matrix " << numMenu[i] << " successfully found.\n";
-            }
-            else if (number == 0)
-            {
-                return 0;
             }
         }
         if (found == false)
@@ -156,6 +160,7 @@ string Matrix::findName()
         cout << "Enter 0 to escape.\n";
         cin >> name;
         name = longName(name);
+cout<<"name\n";
         test.open(name);
         if (name == "Matrix0.txt")
         {
@@ -547,7 +552,6 @@ int Matrix::intEntry()
     do
     {
         cin >> num;
-cout<<"Entry="<<num<<endl;
         for (int i = 0; i < num.size(); i++)
         {
             n = num[i];
@@ -556,7 +560,6 @@ cout<<"Entry="<<num<<endl;
             {
                 isNum = false;
             }
-cout<<"n="<<n<<endl;
         }
         if (isNum == false)
         {
@@ -565,6 +568,7 @@ cout<<"n="<<n<<endl;
     }
     while (isNum == false);
     retNum = stoi(num);
+cout<<"n = "<<retNum<<endl;
     return retNum;
 }
 

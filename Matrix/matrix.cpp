@@ -471,7 +471,7 @@ cout<<"b\n";
 
 void Matrix::QR(int n, Matrix Ea)
 {
-//cout<<"1\n";
+cout<<"1\n";
     if (compareQR() == false)
     {
         return;
@@ -492,8 +492,8 @@ void Matrix::QR(int n, Matrix Ea)
     double temError = 0;
     vector<vector<double> > tempQ;
     vector<vector<double> > mu;
+Ea.printMatrix();
     tempQ = Ea.getMatrix();
-//cout<<"2\n";
     if ((n > 0) && (((tempQ[n - 1][n] > accuracy) || (tempQ[n - 1][n] < (0 - accuracy))) && (((tempQ[n - 1][n] - tempQ[n][n - 1]) < accuracy) && ((tempQ[n - 1][n] - tempQ[n][n - 1]) > 0 - accuracy))))
     {
         mu = wilkinson(tempQ[n - 1][n - 1], tempQ[n - 1][n], tempQ[n][n]);
@@ -503,15 +503,18 @@ void Matrix::QR(int n, Matrix Ea)
         mu = identity(tempQ[n][n]);
     }
     Matrix muvec = Matrix(height, width, mu);
-//cout<<"2\n";
+cout<<"muvec:\n";for (int z = 0; z<muvec.getMatrix().size(); z++){for (int y =0; y<muvec.getMatrix()[0].size(); y++){cout<<muvec.getMatrix()[z][y]<<" ";}cout<<endl;}
+cout<<"2\n";
     mu.clear();
     tempQ.clear();
     Matrix tQ = Ea.subtract(muvec);
+cout<<"tQ:\n";for (int z = 0; z<tQ.getMatrix().size(); z++){for (int y =0; y<tQ.getMatrix()[0].size(); y++){cout<<tQ.getMatrix()[z][y]<<" ";}cout<<endl;}
     tempQ = tQ.getMatrix();
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
-//cout<<"3\n";
+cout<<"3\n";
+cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
     /*
     Steps: 1: Dot the column with previous columns and subtract them to 
     isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
@@ -520,13 +523,17 @@ void Matrix::QR(int n, Matrix Ea)
     */
         for (int j = 0; j < i; j++) // Cylces through previous columns
         {
+cout<<"3.1\n";
+cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
             temDep = 0;
             for (int k = 0; k < height; k++) // Find dot product with previous column
             {
                 temDep += tempQ[k][j] * tempQ[k][i];
+cout<<"temDep: "<<temDep<<endl;
             }
             // Step 2: Subtract dependant columns
-//cout<<"4\n";
+cout<<"temDep: "<<temDep<<endl;
+cout<<"4\n";
             for (int k = 0; k < height; k++)
             {
                 tempQ[k][i] -= temDep * tempQ[k][j];
@@ -538,14 +545,14 @@ void Matrix::QR(int n, Matrix Ea)
         {
             length += tempQ[j][i] * tempQ[j][i];
         }
-//cout<<"5\n";
+cout<<"5\n";
         length = sqrt(length);
         for (int j = 0; j < height; j++)
         {
             tempQ[j][i] /= length;
         }
     }
-//cout<<"6\n";
+cout<<"6\n";
     // Step 4: Find R by E=QR->R=Q'E
     Matrix Qa = Matrix(height, width, tempQ);
     Matrix Qt = Qa.transpose();
@@ -557,7 +564,7 @@ void Matrix::QR(int n, Matrix Ea)
     {
         tempQ[i].clear();
     }
-//cout<<"7\n";
+cout<<"7\n";
     tempQ.clear();
     for (int i = 0; i < height; i++)
     {
@@ -577,19 +584,19 @@ void Matrix::QR(int n, Matrix Ea)
         {
             error += temError / height;
         }
-//cout<<"8\n";
+cout<<"8\n";
     }
     double complex = 0;
     for (int i = 1; i < height; i++)
     {
         complex += Eb.getMatrix()[i][i - 1] * Eb.getMatrix()[i][i - 1];
-//cout<<"9\n";
+cout<<"9\n";
     }
     complex = sqrt(complex) / height;
     if (((complex < accuracy) && (error < accuracy * accuracy * accuracy * height)) || 
         ((complex >= accuracy * height) && (error < accuracy * accuracy * accuracy * height)))
     {
-//cout<<"10\n";
+cout<<"10\n";
         n--;
         error = 0;
         for (int i = 0; i < height - 1; i++)
