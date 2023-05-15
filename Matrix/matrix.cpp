@@ -471,7 +471,7 @@ cout<<"b\n";
 
 void Matrix::QR(int n, Matrix Ea)
 {
-cout<<"1\n";
+//cout<<"1\n";
     if (compareQR() == false)
     {
         return;
@@ -493,7 +493,7 @@ cout<<"1\n";
     vector<vector<double> > tempQ;
     vector<vector<double> > mu;
     tempQ = Ea.getMatrix();
-cout<<"2\n";
+//cout<<"2\n";
     if ((n > 0) && (((tempQ[n - 1][n] > accuracy) || (tempQ[n - 1][n] < (0 - accuracy))) && (((tempQ[n - 1][n] - tempQ[n][n - 1]) < accuracy) && ((tempQ[n - 1][n] - tempQ[n][n - 1]) > 0 - accuracy))))
     {
         mu = wilkinson(tempQ[n - 1][n - 1], tempQ[n - 1][n], tempQ[n][n]);
@@ -503,7 +503,7 @@ cout<<"2\n";
         mu = identity(tempQ[n][n]);
     }
     Matrix muvec = Matrix(height, width, mu);
-cout<<"2\n";
+//cout<<"2\n";
     mu.clear();
     tempQ.clear();
     Matrix tQ = Ea.subtract(muvec);
@@ -511,7 +511,7 @@ cout<<"2\n";
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
-cout<<"3\n";
+//cout<<"3\n";
     /*
     Steps: 1: Dot the column with previous columns and subtract them to 
     isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
@@ -526,7 +526,7 @@ cout<<"3\n";
                 temDep += tempQ[k][j] * tempQ[k][i];
             }
             // Step 2: Subtract dependant columns
-cout<<"4\n";
+//cout<<"4\n";
             for (int k = 0; k < height; k++)
             {
                 tempQ[k][i] -= temDep * tempQ[k][j];
@@ -538,13 +538,14 @@ cout<<"4\n";
         {
             length += tempQ[j][i] * tempQ[j][i];
         }
-cout<<"5\n";
+//cout<<"5\n";
         length = sqrt(length);
         for (int j = 0; j < height; j++)
         {
             tempQ[j][i] /= length;
         }
     }
+//cout<<"6\n";
     // Step 4: Find R by E=QR->R=Q'E
     Matrix Qa = Matrix(height, width, tempQ);
     Matrix Qt = Qa.transpose();
@@ -556,6 +557,7 @@ cout<<"5\n";
     {
         tempQ[i].clear();
     }
+//cout<<"7\n";
     tempQ.clear();
     for (int i = 0; i < height; i++)
     {
@@ -575,16 +577,19 @@ cout<<"5\n";
         {
             error += temError / height;
         }
+//cout<<"8\n";
     }
     double complex = 0;
     for (int i = 1; i < height; i++)
     {
         complex += Eb.getMatrix()[i][i - 1] * Eb.getMatrix()[i][i - 1];
+//cout<<"9\n";
     }
     complex = sqrt(complex) / height;
     if (((complex < accuracy) && (error < accuracy * accuracy * accuracy * height)) || 
         ((complex >= accuracy * height) && (error < accuracy * accuracy * accuracy * height)))
     {
+//cout<<"10\n";
         n--;
         error = 0;
         for (int i = 0; i < height - 1; i++)

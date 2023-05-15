@@ -52,16 +52,16 @@ void Matrix::checkValidity(ifstream & readMatrix)
 
 bool Matrix::ynResponse()
 {
-    char response;
+    string response;
     while (1)
     {
         cout << "Please enter a response Y/N:\n";
         cin >> response;
-        if ((response == 'Y') || (response == 'y'))
+        if ((response == "Y") || (response == "y"))
         {
             return true;
         }
-        if ((response == 'N') || (response == 'n'))
+        if ((response == "N") || (response == "n"))
         {
             return false;
         }
@@ -540,21 +540,23 @@ int Matrix::strChoice()
 int Matrix::intEntry()
 {
     string num;
-    string n;
+    char n;
     bool isNum = true;
     int retNum;
     // Make sure number entry is actually an integer
     do
     {
         cin >> num;
-        for (int i = 0; i < n.length(); i++)
+cout<<"Entry="<<num<<endl;
+        for (int i = 0; i < num.size(); i++)
         {
             n = num[i];
-            if ((n != "0") && (n != "1") && (n != "2") && (n != "3") && (n != "4")
-                && (n != "5") && (n != "6") && (n != "7") && (n != "8") && (n != "9"))
+            if ((n != '0') && (n != '1') && (n != '2') && (n != '3') && (n != '4')
+                && (n != '5') && (n != '6') && (n != '7') && (n != '8') && (n != '9'))
             {
                 isNum = false;
             }
+cout<<"n="<<n<<endl;
         }
         if (isNum == false)
         {
