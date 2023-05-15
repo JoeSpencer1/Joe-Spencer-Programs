@@ -575,76 +575,34 @@ Matrix Matrix::transpose()
     return publish;
 }
 
-double Matrix::determinant()
+double Matrix::determinant(vector<int> rem)
 {
-    vector<double> temp;
-    vector<vector<double> > tempMatrix;
-    if (height == width)
+    double det;
+    double sign = 1;
+    vector<int> nRem;
+    if (rem.size() == 2)
     {
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                temp.push_back(matrix[i][j]);
-            }
-            tempMatrix.push_back(temp);
-            temp.clear();
-        }
-        return determinant(tempMatrix, 0, 0);
+        det = matrix[height - 2][rem[0]] * matrix[height - 1][rem[1]];
+        det -= matrix[height - 2][rem[1]] * matrix[height - 1][rem[0]];
     }
     else
     {
-        cout << "This matrix is not square and does not have a determinant.\n";
-        return 0;
-    }
-}
-
-double Matrix::determinant(vector<vector<double> > toDetermine, int column, int row)
-{
-    vector<vector<double> > nextDetermine;
-    double temp;
-    double factor;
-    double determinant = 1;
-    int counter;
-    if (toDetermine[0].size() == 1)
-    {
-        determinant = toDetermine[0][0];
-    }
-    else if (toDetermine[0].size() == 2)
-    {
-        determinant = toDetermine[0][0] * toDetermine[1][1] - toDetermine[0][1] * toDetermine[1][0];
-    }
-    else
-    {
-        for (int i = 0; i < toDetermine.size(); i++)
+        for (int i = 0; i < rem.size(); i++)
         {
-            if (toDetermine[i][i] == 0)
+            nRem.clear();
+            for (int j = 0; j < i; j++)
             {
-                counter = i + 1;
-                while ((toDetermine[i][counter] == 0) && (counter < width - 1))
-                {
-                    counter ++;
-                }
-                switchRows(toDetermine, i, counter);
+                nRem.push_back(rem[j]);
             }
-            else
+            for (int j = i + 1; j < rem.size(); j++)
             {
-                for (int j = i + 1; j < height; j++)
-                {
-                    factor = toDetermine[j][i] / toDetermine[i][i];
-                    for (int k = i; k < width; k++)
-                    {
-                        toDetermine[j][k] -= factor * toDetermine[i][k];
-                    }
-                }
+                nRem.push_back(rem[j]);
             }
-        }
-        for (int i = 0; i < height; i++)
-        {
-            determinant *= toDetermine[i][i];
+            det += sign * matrix[height - rem.size()][rem[i]] * determinant(nRem);
+            sign *= -1;
         }
     }
-    return determinant;
+    return det;
 }
 
 void Matrix::solve(Matrix solution)
@@ -1069,7 +1027,10 @@ void Matrix::eigenVecs()
             {
                 factor2 -= tEigenv[k] * BaaB[j][k];
             }
-            tEigenv[j] = factor2 / BaaB[j][j];
+            if ((BaaB[j][j] > accuracy) || (BaaB[j][j] < (0 - accuracy)))
+            {
+                tEigenv[j] = factor2 / BaaB[j][j];    
+            }
         }
         // Create real and complex eigenvectors
         for (int j = 0; j < height * 2; j++)
