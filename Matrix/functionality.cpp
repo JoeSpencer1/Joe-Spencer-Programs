@@ -337,7 +337,6 @@ vector<vector<double> > Matrix::polynomial(int row)
     double a = 1;
     double b = -1 * (E[row][row] + E[row + 1][row + 1]);
     double c = E[row][row] * E[row + 1][row + 1] - E[row + 1][row] * E[row][row + 1];
-cout<<"a: "<<a<<", b: "<<b<<", c: "<<c<<endl;
     if ((b * b - 4 * a * c) < 0)
     {
         polynomial[0].push_back(-1 * b / (2 * a));

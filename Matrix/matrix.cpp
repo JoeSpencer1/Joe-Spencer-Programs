@@ -442,9 +442,7 @@ void Matrix::eigenValues()
     vector<vector<double> > poly;
     double real = 0;
     double imaginary = 0;
-cout<<"a\n";
     QR(height - 1, A);
-cout<<"b\n";
     for (int i = 0; i < height; i++)
     {
         if ((i < height - 1) && ((E[i + 1][i] > accuracy * height) || (E[i + 1][i] < 0 - accuracy * height)))
@@ -469,7 +467,6 @@ cout<<"b\n";
 
 void Matrix::QR(int n, Matrix Ea)
 {
-cout<<"1\n";
     if (compareQR() == false)
     {
         return;
@@ -500,18 +497,13 @@ cout<<"1\n";
         mu = identity(tempQ[n][n]);
     }
     Matrix muvec = Matrix(height, width, mu);
-//cout<<"muvec:\n";for (int z = 0; z<muvec.getMatrix().size(); z++){for (int y =0; y<muvec.getMatrix()[0].size(); y++){cout<<muvec.getMatrix()[z][y]<<" ";}cout<<endl;}
-//cout<<"2\n";
     mu.clear();
     tempQ.clear();
     Matrix tQ = Ea.subtract(muvec);
-//cout<<"tQ:\n";for (int z = 0; z<tQ.getMatrix().size(); z++){for (int y =0; y<tQ.getMatrix()[0].size(); y++){cout<<tQ.getMatrix()[z][y]<<" ";}cout<<endl;}
     tempQ = tQ.getMatrix();
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
-//cout<<"3\n";
-//cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
     /*
     Steps: 1: Dot the column with previous columns and subtract them to 
     isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
@@ -520,17 +512,12 @@ cout<<"1\n";
     */
         for (int j = 0; j < i; j++) // Cylces through previous columns
         {
-//cout<<"3.1\n";
-//cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
             temDep = 0;
             for (int k = 0; k < height; k++) // Find dot product with previous column
             {
                 temDep += tempQ[k][j] * tempQ[k][i];
-//cout<<"temDep: "<<temDep<<endl;
             }
             // Step 2: Subtract dependant columns
-//cout<<"temDep: "<<temDep<<endl;
-//cout<<"4\n";
             for (int k = 0; k < height; k++)
             {
                 tempQ[k][i] -= temDep * tempQ[k][j];
@@ -542,7 +529,6 @@ cout<<"1\n";
         {
             length += tempQ[j][i] * tempQ[j][i];
         }
-//cout<<"5\n";
         length = sqrt(length);
         for (int j = 0; j < height; j++)
         {
@@ -552,7 +538,6 @@ cout<<"1\n";
             }
         }
     }
-//cout<<"6\n";
     // Step 4: Find R by E=QR->R=Q'E
     Matrix Qa = Matrix(height, width, tempQ);
     Matrix Qt = Qa.transpose();
@@ -564,7 +549,6 @@ cout<<"1\n";
     {
         tempQ[i].clear();
     }
-cout<<"7\n";
     tempQ.clear();
     for (int i = 0; i < height; i++)
     {
@@ -584,20 +568,16 @@ cout<<"7\n";
         {
             error += temError / height;
         }
-cout<<"8\n";
     }
     double complex = 0;
     for (int i = 1; i < height; i++)
     {
         complex += Eb.getMatrix()[i][i - 1] * Eb.getMatrix()[i][i - 1];
-cout<<"9\n";
     }
     complex = sqrt(complex) / height;
     if (((complex < accuracy) && (error < accuracy * accuracy * accuracy * height)) || 
         ((complex >= accuracy * height) && (error < accuracy * accuracy * accuracy * height)))
     {
-cout<<"10\n";
-cout<<"Qa:\n";for (int z = 0; z<Qa.getMatrix().size(); z++){for (int y =0; y<Qa.getMatrix()[0].size(); y++){cout<<Qa.getMatrix()[z][y]<<" ";}cout<<endl;}
         n--;
         error = 0;
         for (int i = 0; i < height - 1; i++)
@@ -615,8 +595,6 @@ cout<<"Qa:\n";for (int z = 0; z<Qa.getMatrix().size(); z++){for (int y =0; y<Qa.
                 for (int j = 0; j < width; j++)
                 {
                     Q[i][j] = Qa.getMatrix()[i][j];
-cout<<"Qa\n";
-Qa.printMatrix();
                 }
             }
             for (int i = 0; i < height; i++)
@@ -624,8 +602,6 @@ Qa.printMatrix();
                 for (int j = 0; j < width; j++)
                 {
                     R[i][j] = Ra.getMatrix()[i][j];
-cout<<"Ra\n";
-Ra.printMatrix();
                 }
             }
             for (int i = 0; i < height; i++)
@@ -633,8 +609,6 @@ Ra.printMatrix();
                 for (int j = 0; j < width; j++)
                 {
                     E[i][j] = Ea.getMatrix()[i][j];
-cout<<"Ea\n";
-Ea.printMatrix();
                 }
             }
             return;
