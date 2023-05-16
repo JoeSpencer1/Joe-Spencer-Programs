@@ -683,6 +683,7 @@ void Matrix::eigenVecs()
     vector<int> order;
     int row;
     int bottom;
+    int skip;
     double factor1;
     double factor2;
     for (int i = 0; i < height; i++)
@@ -716,7 +717,7 @@ void Matrix::eigenVecs()
                         tempRow.push_back(matrix[j - height][k]);
                     }
                     else
-                    { 
+                    {
                         tempRow.push_back(matrix[j][k - width]);
                     }
                     if ((k == (j - width)) || (k == (j + width)))
@@ -728,6 +729,7 @@ void Matrix::eigenVecs()
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
+        BaaB = multiplicity(BaaB, i);
         // Rearrange BaaB so it does not have any zero entries down its main diagonal.
         if (imaginaryEigen[i] == 0)
         {
@@ -783,8 +785,17 @@ void Matrix::eigenVecs()
         }
         // Set bottom entry to 1 unless it is zero. If it is zero, cancel it and find others.
         bottom = height * 2 - 1;
-        while ((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance)))
+        // Account for special case of matrices with an eigenvalue on the main diagonal.
+        if (diagonal(BaaB) == true)
         {
+            skip = numPrev(i);
+        }
+        while (((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance))) && (skip > 0))
+        {
+            if (((BaaB[bottom][bottom] <= tolerance) && (BaaB[bottom][bottom] >= (0 - tolerance))) && (skip > 0))
+            {
+                skip --;
+            }
             bottom --;
             if (bottom < 0)
             {

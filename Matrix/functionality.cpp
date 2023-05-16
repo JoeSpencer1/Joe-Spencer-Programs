@@ -684,34 +684,62 @@ vector<vector<double> > Matrix::multiplicity(vector<vector<double> > BaaB, int n
     {
         if ((realEigen[i] == realEigen[n]) && (imaginaryEigen[i] == imaginaryEigen[n]))
         {
-            for (int j = 0; j < height; j++)
+            for (int j = 0; j < width; j++)
             {
-                for (int k = 0; k < width; k++)
+                for (int k = 0; k < height; k++)
                 {
                     entry = 0;
-                    for (int l = 0; l < height; l++)
+                    // Multiply real components
+                    for (int l = width; l < width * 2; l++)
                     {
-                        entry += BaaB[j][l + width] * BaaB2[l + width][k];
-                        if (j == (l + width))
-                        {
-                            entry -= BaaB[j][l] * BaaB2[l][k];
-                        }
+                        entry += BaaB2[l][j] * BaaB2[k][l];
                     }
-                    BaaB3[j][k + width] = entry;
-                    BaaB3[j + width][k] = entry;
+                    // Multiply imaginary components
+                    for (int l = 0; l < width; l++)
+                    {
+                        entry -= BaaB2[l][j] * BaaB2[k][l];
+                    }
+                    BaaB3[k][j + width] = entry;
+                    BaaB3[k + height][j] = entry;
                     entry = 0;
-                    for (int l = 0; l < height; l++)
+                    // Multiply real and imaginary components
+                    for (int l = 0; l < width; l++)
                     {
-                        entry += BaaB[j + width][l] * BaaB2[l][k + width];
-                        entry += BaaB[j][l + width] * BaaB2[l + width][k];
+                        entry += BaaB2[l][j] * BaaB2[k][l + width];
+                        entry += BaaB2[l + width][j] * BaaB2[k][l];
                     }
-                    BaaB3[j][k] = entry;
-                    BaaB3[j + width][k + width] = entry;
+                    BaaB3[k][j] = entry;
+                    BaaB3[k + height][j + width] = entry;
                 }
             }
         }
         BaaB2 = BaaB3;
     }
-for (int i = 0; i < height * 2; i ++){for(int j = 0; j < width * 2; j++){cout<<BaaB2[i][j]<<" ";}cout<<"\n";}
     return BaaB2;
+}
+
+int Matrix::numPrev(int n)
+{
+    int num = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if ((realEigen[i] == realEigen[n]) && (imaginaryEigen[i] == imaginaryEigen[n]))
+        {
+            num ++;
+        }
+    }
+    return num;
+}
+
+bool Matrix::diagonal(vector<vector<double> > BaaB)
+{
+    bool diag = false;
+    for (int i = 0; i < width; i++)
+    {
+        if ((BaaB[i][i] == 0) && (BaaB[i + width][i] == 0))
+        {
+            diag = true;
+        }
+    }
+    return diag;
 }

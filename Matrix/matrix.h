@@ -42,6 +42,7 @@ public:
     bool checkCompatibility(Matrix Other);
     void checkValidity(ifstream & readMatrix);
     bool compareQR();
+    bool diagonal(vector<vector<double> > BaaB);
     double determinant();
     string findName();
     string generateName();
@@ -55,6 +56,7 @@ public:
     string longName(string shortName);
     vector<vector<double> > multiplicity(vector<vector<double> > BaaB, int n);
     vector<vector<double> > normalizeBottom(vector<double> real, vector<double> imag);
+    int numPrev(int n);
     void printEigen();
     void printEigenVec();
     void printMatrix();
