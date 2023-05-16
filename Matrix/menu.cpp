@@ -20,7 +20,7 @@ void Matrix::menu()
         cout << "0: Exit, 1: Enter a New Matrix, 2: Read Matrix from File\n";
         cout << "3: Display, 4: Get Dimensions, 5: Scale by Constant\n";
         cout << "6: Find Determinant, 7: Find Eigenvalues and Eigenvectors\n";
-        cout << "8: Invert, 9: Transpose, 10: Find Trace, 11: Find L2 norm\n";
+        cout << "8: Invert, 9: Transpose, 10: Find Trace, 11: Find L1 and L2 norms\n";
         cout << "12: Solve, 13: Add, 14: Subtract, 15: Cross-Multiply\n";
         cout << "Press the X key to go back.\n";
         choice = strChoice();
@@ -120,6 +120,7 @@ void Matrix::menu()
         if (choice == 11)
         {
             l2n = A.l2norm();
+            cout << "L1 norm = " << norm1 << endl;
             cout << "L2 norm = " << l2n << endl;
         }
     }

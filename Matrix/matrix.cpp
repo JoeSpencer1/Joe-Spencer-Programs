@@ -439,7 +439,7 @@ double Matrix::trace()
 void Matrix::eigenValues()
 {
     Matrix A = Matrix(height, width, matrix);
-    vector<double> poly;
+    vector<vector<double> > poly;
     double real = 0;
     double imaginary = 0;
 cout<<"a\n";
@@ -450,12 +450,10 @@ cout<<"b\n";
         if ((i < height - 1) && ((E[i + 1][i] > accuracy * height) || (E[i + 1][i] < 0 - accuracy * height)))
         {
             poly = polynomial(i);
-            real = poly[0];
-            imaginary = poly[1];
-            realEigen.push_back(real);
-            imaginaryEigen.push_back(imaginary);
-            realEigen.push_back(real);
-            imaginaryEigen.push_back(0 - imaginary);
+            realEigen.push_back(poly[0][0]);
+            imaginaryEigen.push_back(poly[1][0]);
+            realEigen.push_back(poly[0][1]);
+            imaginaryEigen.push_back(poly[1][1]);
             i++;
         }
         else
@@ -492,7 +490,6 @@ cout<<"1\n";
     double temError = 0;
     vector<vector<double> > tempQ;
     vector<vector<double> > mu;
-Ea.printMatrix();
     tempQ = Ea.getMatrix();
     if ((n > 0) && (((tempQ[n - 1][n] > accuracy) || (tempQ[n - 1][n] < (0 - accuracy))) && (((tempQ[n - 1][n] - tempQ[n][n - 1]) < accuracy) && ((tempQ[n - 1][n] - tempQ[n][n - 1]) > 0 - accuracy))))
     {
@@ -503,18 +500,18 @@ Ea.printMatrix();
         mu = identity(tempQ[n][n]);
     }
     Matrix muvec = Matrix(height, width, mu);
-cout<<"muvec:\n";for (int z = 0; z<muvec.getMatrix().size(); z++){for (int y =0; y<muvec.getMatrix()[0].size(); y++){cout<<muvec.getMatrix()[z][y]<<" ";}cout<<endl;}
-cout<<"2\n";
+//cout<<"muvec:\n";for (int z = 0; z<muvec.getMatrix().size(); z++){for (int y =0; y<muvec.getMatrix()[0].size(); y++){cout<<muvec.getMatrix()[z][y]<<" ";}cout<<endl;}
+//cout<<"2\n";
     mu.clear();
     tempQ.clear();
     Matrix tQ = Ea.subtract(muvec);
-cout<<"tQ:\n";for (int z = 0; z<tQ.getMatrix().size(); z++){for (int y =0; y<tQ.getMatrix()[0].size(); y++){cout<<tQ.getMatrix()[z][y]<<" ";}cout<<endl;}
+//cout<<"tQ:\n";for (int z = 0; z<tQ.getMatrix().size(); z++){for (int y =0; y<tQ.getMatrix()[0].size(); y++){cout<<tQ.getMatrix()[z][y]<<" ";}cout<<endl;}
     tempQ = tQ.getMatrix();
     // For each column, you need to find the perpendicular component.
     for (int i = 0; i < width; i++)
     {
-cout<<"3\n";
-cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
+//cout<<"3\n";
+//cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
     /*
     Steps: 1: Dot the column with previous columns and subtract them to 
     isolate linearly independent columns. 2: Subtract dependant columns to form orthogonal
@@ -523,17 +520,17 @@ cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].
     */
         for (int j = 0; j < i; j++) // Cylces through previous columns
         {
-cout<<"3.1\n";
-cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
+//cout<<"3.1\n";
+//cout<<"tempQ:\n";for (int z = 0; z<tempQ.size(); z++){for (int y =0; y<tempQ[0].size(); y++){cout<<tempQ[z][y]<<" ";}cout<<endl;}
             temDep = 0;
             for (int k = 0; k < height; k++) // Find dot product with previous column
             {
                 temDep += tempQ[k][j] * tempQ[k][i];
-cout<<"temDep: "<<temDep<<endl;
+//cout<<"temDep: "<<temDep<<endl;
             }
             // Step 2: Subtract dependant columns
-cout<<"temDep: "<<temDep<<endl;
-cout<<"4\n";
+//cout<<"temDep: "<<temDep<<endl;
+//cout<<"4\n";
             for (int k = 0; k < height; k++)
             {
                 tempQ[k][i] -= temDep * tempQ[k][j];
@@ -545,14 +542,17 @@ cout<<"4\n";
         {
             length += tempQ[j][i] * tempQ[j][i];
         }
-cout<<"5\n";
+//cout<<"5\n";
         length = sqrt(length);
         for (int j = 0; j < height; j++)
         {
-            tempQ[j][i] /= length;
+            if ((length > accuracy) || (length < (0 - accuracy)))
+            {
+                tempQ[j][i] /= length;
+            }
         }
     }
-cout<<"6\n";
+//cout<<"6\n";
     // Step 4: Find R by E=QR->R=Q'E
     Matrix Qa = Matrix(height, width, tempQ);
     Matrix Qt = Qa.transpose();
@@ -597,6 +597,7 @@ cout<<"9\n";
         ((complex >= accuracy * height) && (error < accuracy * accuracy * accuracy * height)))
     {
 cout<<"10\n";
+cout<<"Qa:\n";for (int z = 0; z<Qa.getMatrix().size(); z++){for (int y =0; y<Qa.getMatrix()[0].size(); y++){cout<<Qa.getMatrix()[z][y]<<" ";}cout<<endl;}
         n--;
         error = 0;
         for (int i = 0; i < height - 1; i++)
@@ -614,6 +615,8 @@ cout<<"10\n";
                 for (int j = 0; j < width; j++)
                 {
                     Q[i][j] = Qa.getMatrix()[i][j];
+cout<<"Qa\n";
+Qa.printMatrix();
                 }
             }
             for (int i = 0; i < height; i++)
@@ -621,6 +624,8 @@ cout<<"10\n";
                 for (int j = 0; j < width; j++)
                 {
                     R[i][j] = Ra.getMatrix()[i][j];
+cout<<"Ra\n";
+Ra.printMatrix();
                 }
             }
             for (int i = 0; i < height; i++)
@@ -628,6 +633,8 @@ cout<<"10\n";
                 for (int j = 0; j < width; j++)
                 {
                     E[i][j] = Ea.getMatrix()[i][j];
+cout<<"Ea\n";
+Ea.printMatrix();
                 }
             }
             return;
@@ -874,14 +881,17 @@ void Matrix::eigenVecs()
 
 double Matrix::l2norm()
 {
-    double norm = 0;
+    if (norm2 != 0)
+    {
+        return norm2;
+    }
     if (matrix[0].size() == 1)
     {
         for (int i = 0; i < matrix.size(); i++)
         {
-            norm += matrix[i][0] * matrix[i][0];
+            norm2 += matrix[i][0] * matrix[i][0];
         }
-        norm = sqrt(norm);
+        norm2 = sqrt(norm2);
     }
     else
     {
@@ -890,12 +900,12 @@ double Matrix::l2norm()
         vector<vector<double> > normV = A2.returnEigen();
         for (int i = 0; i < normV[0].size(); i++)
         {
-            if ((normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]) > norm)
+            if ((normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]) > norm2)
             {
-                norm = (normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]);
+                norm2 = (normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]);
             }
-            norm = sqrt(norm);
+            norm2 = sqrt(norm2);
         }
     }
-    return norm;
+    return norm2;
 }

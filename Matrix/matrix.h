@@ -60,7 +60,7 @@ public:
     void printMatrix();
     void publishFile();
     void publishNew(int rows, int columns, vector<vector<double> > newMatrix);
-    vector<double> polynomial(int row);
+    vector<vector<double> > polynomial(int row);
     vector<vector<double> > returnEigen();
     Matrix retreiveMatrix(string number);
     vector<vector<double> > rref();
@@ -76,7 +76,8 @@ private:
     string name;
     int height;
     int width;
-    double norm;
+    double norm1;
+    double norm2;
     vector<vector<double> > Q;
     vector<vector<double> > R;
     vector<vector<double> > E;

@@ -326,16 +326,32 @@ double Matrix::determinant()
     }
 }
 
-vector<double> Matrix::polynomial(int row)
+vector<vector<double> > Matrix::polynomial(int row)
 {
-    vector<double> polynomial;
+    vector<vector<double> > polynomial;
+    vector<double> temp;
+    polynomial.push_back(temp);
+    polynomial.push_back(temp);
     double real;
     double imaginary;
     double a = 1;
     double b = -1 * (E[row][row] + E[row + 1][row + 1]);
     double c = E[row][row] * E[row + 1][row + 1] - E[row + 1][row] * E[row][row + 1];
-    polynomial.push_back(-1 * b / (2 * a));
-    polynomial.push_back(sqrt(4 * a * c - b * b) / (2 * a));
+cout<<"a: "<<a<<", b: "<<b<<", c: "<<c<<endl;
+    if ((b * b - 4 * a * c) < 0)
+    {
+        polynomial[0].push_back(-1 * b / (2 * a));
+        polynomial[1].push_back(sqrt(4 * a * c - b * b) / (2 * a));
+        polynomial[0].push_back(-1 * b / (2 * a));
+        polynomial[1].push_back(-1 * sqrt(4 * a * c - b * b) / (2 * a));
+    }
+    else
+    {
+        polynomial[0].push_back((-1 * b + sqrt(b * b - 4 * a * c)) / (2 * a));
+        polynomial[1].push_back(0);
+        polynomial[0].push_back((-1 * b - sqrt(b * b - 4 * a * c)) / (2 * a));
+        polynomial[1].push_back(0);
+    }
     return polynomial;
 }
 
@@ -493,6 +509,10 @@ void Matrix::printEigenVec()
             if ((realEigenVectors[i][j] > tolerance) || (realEigenVectors[i][j] < (0 - tolerance))
             || (imaginaryEigenVectors[i][j] == 0))
             {
+                if ((realEigenVectors[i][j] < 0) && (realEigenVectors[i][j] > (0 - tolerance)))
+                {
+                    realEigenVectors[i][j] = 0 - realEigenVectors[i][j];
+                }
                 cout << realEigenVectors[i][j];
             }
             if ((imaginaryEigenVectors[i][j] > tolerance) || (imaginaryEigenVectors[i][j] < (0 - tolerance)))
@@ -564,11 +584,11 @@ int Matrix::intEntry()
         if (isNum == false)
         {
             cout << "Please enter a number\n";
+            cin.clear();
         }
     }
     while (isNum == false);
     retNum = stoi(num);
-cout<<"n = "<<retNum<<endl;
     return retNum;
 }
 
@@ -602,6 +622,7 @@ double Matrix::decEntry()
         if (isNum == false)
         {
             cout << "Please enter a number\n";
+            cin.clear();
         }
     }
     while (isNum == false);
