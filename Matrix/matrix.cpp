@@ -269,12 +269,13 @@ Matrix Matrix::householder()
 
 Matrix Matrix::invert()
 {
-    double scale;
+    double scalea;
     vector<vector<double> > inverse;
     vector<vector<double> > solve;
     vector<double> tempVector;
     vector<double> row;
     Matrix publish = Matrix(0, 0, inverse);
+//    scale1(true);
     if (invertible() == false)
     {
         return publish;
@@ -315,19 +316,22 @@ Matrix Matrix::invert()
                 switchRows(inverse, i, j);
                 j++;
             }
-            scale = solve[i][i];
+            scalea = solve[i][i];
             for (int j = 0; j < solve.size(); j++)
             {
-                solve[i][j] /= scale;
-                inverse[i][j] /= scale;
+                if ((scalea > accuracy) && (scalea < 0 - accuracy))
+                {
+                    solve[i][j] /= scalea;
+                    inverse[i][j] /= scalea;
+                }
             }
             for (int j = i + 1; j < solve.size(); j++)
             {
-                scale = solve[j][i];
+                scalea = solve[j][i];
                 for (int k = 0; k < solve.size(); k++)
                 {
-                    solve[j][k] -= solve[i][k] * scale;
-                    inverse[j][k] -= inverse[i][k] * scale;
+                    solve[j][k] -= solve[i][k] * scalea;
+                    inverse[j][k] -= inverse[i][k] * scalea;
                 }
             }
         }
@@ -335,16 +339,24 @@ Matrix Matrix::invert()
         {
             for (int j = 0; j < i; j++)
             {
-                scale = solve[j][i];
-                solve[j][i] -= solve[i][i] * scale;
+                scalea = solve[j][i];
+                solve[j][i] -= solve[i][i] * scalea;
                 for (int k = 0; k < solve.size(); k++)
                 {
-                    inverse[j][k] -= inverse[i][k] * scale;
+                    inverse[j][k] -= inverse[i][k] * scalea;
                 }
             }
         }
-        publish = Matrix(inverse.size(), inverse[0].size(), inverse);
+/*        for (int i = 0; i < inverse.size(); i++)
+        {
+            for (int j = 0; j < inverse.size(); j++)
+            {
+                inverse[i][j] *= height / norm2;
+            }
+        }
+*/        publish = Matrix(inverse.size(), inverse[0].size(), inverse);
     }
+//    scale1(false);
     solve.clear();
     row.clear();
     inverse.clear();
@@ -889,11 +901,11 @@ void Matrix::eigenVecs()
     return;
 }
 
-double Matrix::l2norm()
+void Matrix::l2Norm()
 {
     if (norm2 != 0)
     {
-        return norm2;
+        return;
     }
     if (matrix[0].size() == 1)
     {
@@ -917,5 +929,5 @@ double Matrix::l2norm()
             norm2 = sqrt(norm2);
         }
     }
-    return norm2;
+    return;
 }

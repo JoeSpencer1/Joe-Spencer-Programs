@@ -28,9 +28,10 @@ public:
     void eigen2x2();
     Matrix invert();
     bool invertible();
-    double l2norm();
+    void l2Norm();
     void QR(int n, Matrix Ea);
     Matrix scale(double constant);
+    void scale1(bool first);
     void solve(Matrix solution);
     Matrix subtract(Matrix Other);
     double trace();

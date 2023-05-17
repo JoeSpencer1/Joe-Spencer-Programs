@@ -160,7 +160,6 @@ string Matrix::findName()
         cout << "Enter 0 to escape.\n";
         cin >> name;
         name = longName(name);
-cout<<"name\n";
         test.open(name);
         if (name == "Matrix0.txt")
         {
@@ -584,7 +583,9 @@ int Matrix::intEntry()
         {
             cout << "Please enter a number\n";
             cin.clear();
+            cin.ignore(INT_MAX);
         }
+        cin.clear();
     }
     while (isNum == false);
     retNum = stoi(num);
@@ -622,6 +623,7 @@ double Matrix::decEntry()
         {
             cout << "Please enter a number\n";
             cin.clear();
+            cin.ignore(INT_MAX);
         }
     }
     while (isNum == false);
@@ -742,4 +744,22 @@ bool Matrix::diagonal(vector<vector<double> > BaaB)
         }
     }
     return diag;
+}
+
+void Matrix::scale1(bool first)
+{
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            if (first == true)
+            {
+                matrix[i][j] *= height / norm2;
+            }
+            else
+            {
+                matrix[i][j] *= norm2 / height;
+            }
+        }
+    }
 }

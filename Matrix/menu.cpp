@@ -10,7 +10,6 @@ void Matrix::menu()
     char response;
     double constant;
     double tr;
-    double l2n;
     bool esc = false;
     cout << "Please select your desired matrix option,\n";
     cout << "or press 0 to view menu:\n";
@@ -119,9 +118,9 @@ void Matrix::menu()
         }
         if (choice == 11)
         {
-            l2n = A.l2norm();
+            A.l2Norm();
             cout << "L1 norm = " << norm1 << endl;
-            cout << "L2 norm = " << l2n << endl;
+            cout << "L2 norm = " << norm2 << endl;
         }
     }
     // 2 Matrices
