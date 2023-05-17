@@ -488,6 +488,19 @@ void Matrix::QR(int n, Matrix Ea)
     vector<vector<double> > tempQ;
     vector<vector<double> > mu;
     tempQ = Ea.getMatrix();
+    double add = 0;
+    for (int i = 0; i < tempQ.size(); i++)
+    {
+        if ((tempQ[i][i] < tolerance) && (tempQ[i][i] > 0 - tolerance))
+        {
+            add += 1;
+            i = 0;
+            for (int j = 0; j < tempQ.size(); j++)
+            {
+                tempQ[j][j] += 1;
+            }
+        }
+    }
     if ((n > 0) && (((tempQ[n - 1][n] > accuracy) || (tempQ[n - 1][n] < (0 - accuracy))) && (((tempQ[n - 1][n] - tempQ[n][n - 1]) < accuracy) && ((tempQ[n - 1][n] - tempQ[n][n - 1]) > 0 - accuracy))))
     {
         mu = wilkinson(tempQ[n - 1][n - 1], tempQ[n - 1][n], tempQ[n][n]);
@@ -729,9 +742,7 @@ void Matrix::eigenVecs()
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
-for(int i=0;i<BaaB.size();i++){for(int j=0;j<BaaB[0].size();j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         BaaB = multiplicity(BaaB, i);
-for(int i=0;i<BaaB.size();i++){for(int j=0;j<BaaB[0].size();j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Rearrange BaaB so it does not have any zero entries down its main diagonal.
         if (imaginaryEigen[i] == 0)
         {
@@ -791,7 +802,6 @@ for(int i=0;i<BaaB.size();i++){for(int j=0;j<BaaB[0].size();j++){cout<<BaaB[i][j
         if (diagonal(BaaB) == true)
         {
             skip = numPrev(i);
-cout<<"Skip: "<<i<<" "<<skip<<endl;
         }
         while (((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance))) || (skip > 0))
         {
@@ -806,7 +816,6 @@ cout<<"Skip: "<<i<<" "<<skip<<endl;
                 break;
             }
         }
-cout<<"Bottom="<<bottom<<"\n";
         for (int j = (height * 2 - 1); j > bottom; j--)
         {
             for (int k = 0; k < (height * 2); k++)
