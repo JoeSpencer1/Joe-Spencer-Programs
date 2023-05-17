@@ -729,7 +729,9 @@ void Matrix::eigenVecs()
             BaaB.push_back(tempRow);
             tempRow.clear();
         }
+for(int i=0;i<BaaB.size();i++){for(int j=0;j<BaaB[0].size();j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         BaaB = multiplicity(BaaB, i);
+for(int i=0;i<BaaB.size();i++){for(int j=0;j<BaaB[0].size();j++){cout<<BaaB[i][j]<<" ";}cout<<endl;}
         // Rearrange BaaB so it does not have any zero entries down its main diagonal.
         if (imaginaryEigen[i] == 0)
         {
@@ -789,8 +791,9 @@ void Matrix::eigenVecs()
         if (diagonal(BaaB) == true)
         {
             skip = numPrev(i);
+cout<<"Skip: "<<i<<" "<<skip<<endl;
         }
-        while (((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance))) && (skip > 0))
+        while (((BaaB[bottom][bottom] > tolerance) || (BaaB[bottom][bottom] < (0 - tolerance))) || (skip > 0))
         {
             if (((BaaB[bottom][bottom] <= tolerance) && (BaaB[bottom][bottom] >= (0 - tolerance))) && (skip > 0))
             {
@@ -803,6 +806,7 @@ void Matrix::eigenVecs()
                 break;
             }
         }
+cout<<"Bottom="<<bottom<<"\n";
         for (int j = (height * 2 - 1); j > bottom; j--)
         {
             for (int k = 0; k < (height * 2); k++)

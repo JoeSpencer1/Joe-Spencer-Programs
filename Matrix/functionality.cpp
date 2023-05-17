@@ -690,7 +690,7 @@ vector<vector<double> > Matrix::multiplicity(vector<vector<double> > BaaB, int n
                 {
                     entry = 0;
                     // Multiply real components
-                    for (int l = width; l < width * 2; l++)
+                    for (int l = height; l < height * 2; l++)
                     {
                         entry += BaaB2[l][j] * BaaB2[k][l];
                     }
