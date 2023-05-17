@@ -608,6 +608,10 @@ void Matrix::QR(int n, Matrix Ea)
                 for (int j = 0; j < width; j++)
                 {
                     Q[i][j] = Qa.getMatrix()[i][j];
+                    if (i == j)
+                    {
+                        Q[i][j] -= add;
+                    }
                 }
             }
             for (int i = 0; i < height; i++)
@@ -615,6 +619,10 @@ void Matrix::QR(int n, Matrix Ea)
                 for (int j = 0; j < width; j++)
                 {
                     R[i][j] = Ra.getMatrix()[i][j];
+                    if (i == j)
+                    {
+                        R[i][j] -= add;
+                    }
                 }
             }
             for (int i = 0; i < height; i++)
@@ -622,6 +630,10 @@ void Matrix::QR(int n, Matrix Ea)
                 for (int j = 0; j < width; j++)
                 {
                     E[i][j] = Ea.getMatrix()[i][j];
+                    if (i == j)
+                    {
+                        E[i][j] -= add;
+                    }
                 }
             }
             return;
