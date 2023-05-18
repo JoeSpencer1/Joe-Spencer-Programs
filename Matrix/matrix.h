@@ -31,7 +31,6 @@ public:
     void l2Norm();
     void QR(int n, Matrix Ea);
     Matrix scale(double constant);
-    void scale1(bool first);
     void solve(Matrix solution);
     Matrix subtract(Matrix Other);
     double trace();

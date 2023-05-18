@@ -745,21 +745,3 @@ bool Matrix::diagonal(vector<vector<double> > BaaB)
     }
     return diag;
 }
-
-void Matrix::scale1(bool first)
-{
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < height; j++)
-        {
-            if (first == true)
-            {
-                matrix[i][j] *= height / norm2;
-            }
-            else
-            {
-                matrix[i][j] *= norm2 / height;
-            }
-        }
-    }
-}

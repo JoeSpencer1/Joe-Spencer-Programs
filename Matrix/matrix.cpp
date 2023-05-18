@@ -275,7 +275,6 @@ Matrix Matrix::invert()
     vector<double> tempVector;
     vector<double> row;
     Matrix publish = Matrix(0, 0, inverse);
-//    scale1(true);
     if (invertible() == false)
     {
         return publish;
@@ -347,16 +346,8 @@ Matrix Matrix::invert()
                 }
             }
         }
-/*        for (int i = 0; i < inverse.size(); i++)
-        {
-            for (int j = 0; j < inverse.size(); j++)
-            {
-                inverse[i][j] *= height / norm2;
-            }
-        }
-*/        publish = Matrix(inverse.size(), inverse[0].size(), inverse);
+        publish = Matrix(inverse.size(), inverse[0].size(), inverse);
     }
-//    scale1(false);
     solve.clear();
     row.clear();
     inverse.clear();
@@ -450,7 +441,11 @@ double Matrix::trace()
 
 void Matrix::eigenValues()
 {
-    Matrix A = Matrix(height, width, matrix);
+//    Matrix A = Matrix(height, width, matrix);
+//    l2Norm();
+//    cout<<"Norm2: "<<norm2<<endl;
+    Matrix A = scale(1 / norm1);
+
     vector<vector<double> > poly;
     double real = 0;
     double imaginary = 0;
@@ -460,17 +455,17 @@ void Matrix::eigenValues()
         if ((i < height - 1) && ((E[i + 1][i] > accuracy * height) || (E[i + 1][i] < 0 - accuracy * height)))
         {
             poly = polynomial(i);
-            realEigen.push_back(poly[0][0]);
-            imaginaryEigen.push_back(poly[1][0]);
-            realEigen.push_back(poly[0][1]);
-            imaginaryEigen.push_back(poly[1][1]);
+            realEigen.push_back(poly[0][0] * norm1);
+            imaginaryEigen.push_back(poly[1][0] * norm1);
+            realEigen.push_back(poly[0][1] * norm1);
+            imaginaryEigen.push_back(poly[1][1] * norm1);
             i++;
         }
         else
         {
             real = E[i][i];
             imaginary = 0;
-            realEigen.push_back(real);
+            realEigen.push_back(real * norm1);
             imaginaryEigen.push_back(imaginary);
         }
     }
@@ -903,7 +898,7 @@ void Matrix::eigenVecs()
 
 void Matrix::l2Norm()
 {
-    if (norm2 != 0)
+    if (norm2 > 0)
     {
         return;
     }
@@ -914,11 +909,13 @@ void Matrix::l2Norm()
             norm2 += matrix[i][0] * matrix[i][0];
         }
         norm2 = sqrt(norm2);
+        return;
     }
     else
     {
         Matrix A = Matrix(height, width, matrix);
         Matrix A2 = A.cross(A.transpose(), false);
+A2.printMatrix();
         vector<vector<double> > normV = A2.returnEigen();
         for (int i = 0; i < normV[0].size(); i++)
         {
@@ -927,7 +924,8 @@ void Matrix::l2Norm()
                 norm2 = (normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]);
             }
             norm2 = sqrt(norm2);
+cout<<norm2<<endl;
         }
+        return;
     }
-    return;
 }
