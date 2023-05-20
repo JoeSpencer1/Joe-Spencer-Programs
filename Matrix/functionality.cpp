@@ -196,7 +196,7 @@ bool Matrix::checkCompatibility(Matrix Other)
     {
         return true;
     }
-    if (getWidth() == Other.getHeight())
+    if ((getWidth() == Other.getHeight()) && (getWidth() > 0))
     {
         return true;
     }
@@ -240,7 +240,7 @@ bool Matrix::invertible()
         cout << "Width != height\n";
         return false;
     }
-    double det = characteristic();
+    double det = determinant();
     if (det == 0)
     {
         cout << "Determinant = 0\n";
@@ -357,14 +357,8 @@ void Matrix::addToList(Matrix A)
 {
     matrixMenu.push_back(A);
     int nextNum;
-    if (numMenu.size() == 0)
-    {
-        nextNum = 1;
-    }
-    else
-    {
-        nextNum = numMenu.size() + 1;
-    }
+    nextNum = numMenu.size() + 1;
+    cout << "Matrix added to list at position " << nextNum << ".\n";
     numMenu.push_back(nextNum);
 }
 
@@ -542,9 +536,9 @@ int Matrix::strChoice()
     string sc;
     int choice;
     cin >> sc;
-    if ((sc == "0") || (sc == "1") || (sc == "2") || (sc == "3") || (sc == "4")
-        || (sc == "5") || (sc == "6") || (sc == "7") || (sc == "8") || (sc == "9")
-        || (sc == "10") || (sc == "11") || (sc == "12") || (sc == "13") || (sc == "1"))
+    if ((sc == "0") || (sc == "1") || (sc == "2") || (sc == "3") || (sc == "4") || (sc == "5")
+        || (sc == "6") || (sc == "7") || (sc == "8") || (sc == "9") || (sc == "10")
+        || (sc == "11") || (sc == "12") || (sc == "13") || (sc == "14") || (sc == "15"))
     {
         choice = stoi(sc);
     }

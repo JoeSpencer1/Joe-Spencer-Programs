@@ -269,7 +269,7 @@ Matrix Matrix::householder()
 
 Matrix Matrix::invert()
 {
-    double scalea;
+    double fac;
     vector<vector<double> > inverse;
     vector<vector<double> > solve;
     vector<double> tempVector;
@@ -285,7 +285,6 @@ Matrix Matrix::invert()
         {
             for (int j = 0; j < matrix[0].size(); j++)
             {
-                tempVector.push_back(matrix[i][j]);
                 if (j == i)
                 {
                     row.push_back(1);
@@ -295,56 +294,36 @@ Matrix Matrix::invert()
                     row.push_back(0);
                 }
             }
-            solve.push_back(tempVector);
-            tempVector.clear();
+            solve.push_back(matrix[i]);
             inverse.push_back(row);
             row.clear();
         }
-        for (int i = 0; i < solve.size(); i++)
-        {
-            int j = i + 1;
-            while (solve[i][i] == 0)
+        for (int i = 0; i < height; i++)
+        {   
+            if (solve[i][i] == 0)
             {
-                if (j == solve.size())
+                int j = 0;
+                while (solve[j][i] == 0)
                 {
-                    cout << "This matrix is not invertible.\n";
-                    inverse.clear();
-                    return Matrix(0, 0, inverse);
+                    j ++;
                 }
-                switchRows(solve, i, j);
-                switchRows(inverse, i, j);
-                j++;
-            }
-            scalea = solve[i][i];
-            for (int j = 0; j < solve.size(); j++)
-            {
-                if ((scalea > accuracy) && (scalea < 0 - accuracy))
+                for (int k = 0; k < width; k++)
                 {
-                    solve[i][j] /= scalea;
-                    inverse[i][j] /= scalea;
+                    solve[i][k] += solve[j][k] / solve[j][i];
+                    inverse[i][k] += inverse[j][k] / solve[j][i];
                 }
             }
-            for (int j = i + 1; j < solve.size(); j++)
+            tempVector = solve[i];
+            fac = solve[i][i];
+            for (int j = 0; j < height; j++)
             {
-                scalea = solve[j][i];
-                for (int k = 0; k < solve.size(); k++)
+                for (int k = 0; k < width; k++)
                 {
-                    solve[j][k] -= solve[i][k] * scalea;
-                    inverse[j][k] -= inverse[i][k] * scalea;
+                    if (j == i)
+                    {}
                 }
             }
-        }
-        for (int i = solve.size() - 1; i >= 0; i--)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                scalea = solve[j][i];
-                solve[j][i] -= solve[i][i] * scalea;
-                for (int k = 0; k < solve.size(); k++)
-                {
-                    inverse[j][k] -= inverse[i][k] * scalea;
-                }
-            }
+
         }
         publish = Matrix(inverse.size(), inverse[0].size(), inverse);
     }
@@ -375,7 +354,11 @@ double Matrix::determinant(vector<int> rem)
     double det;
     double sign = 1;
     vector<int> nRem;
-    if (rem.size() == 2)
+    if (rem.size() == 1)
+    {
+        det = matrix[0][0];
+    }
+    else if (rem.size() == 2)
     {
         det = matrix[height - 2][rem[0]] * matrix[height - 1][rem[1]];
         det -= matrix[height - 2][rem[1]] * matrix[height - 1][rem[0]];
