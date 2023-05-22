@@ -274,6 +274,7 @@ Matrix Matrix::invert()
     vector<vector<double> > solve;
     vector<double> tempVector;
     vector<double> row;
+    vector<double> invRow;
     Matrix publish = Matrix(0, 0, inverse);
     if (invertible() == false)
     {
@@ -302,7 +303,7 @@ Matrix Matrix::invert()
         {   
             if (solve[i][i] == 0)
             {
-                int j = 0;
+                int j = i + 1;
                 while (solve[j][i] == 0)
                 {
                     j ++;
@@ -313,22 +314,56 @@ Matrix Matrix::invert()
                     inverse[i][k] += inverse[j][k] / solve[j][i];
                 }
             }
-            tempVector = solve[i];
             fac = solve[i][i];
+            tempVector = solve[i];
+            invRow = inverse[i];
+            for (int j = 0; j < width; j++)
+            {
+                tempVector[j] /= fac;
+                invRow[j] /= fac;
+                solve[i][j] /= fac;
+                inverse[i][j] /= fac;
+            }
             for (int j = 0; j < height; j++)
             {
-                for (int k = 0; k < width; k++)
+                if (j != i)
                 {
-                    if (j == i)
-                    {}
+                    fac = solve[j][i];
+                    for (int k = 0; k < width; k++)
+                    {
+                        solve[j][k] -= tempVector[k] * fac;
+                        inverse[j][k] -= invRow[k] * fac;
+                    }
                 }
             }
-
+        }
+        for (int i = height - 1; i >= 0; i--)
+        {
+            for (int j = i - 1; j >= 0; j--)
+            {
+                fac = solve[i][j];
+                for (int k = 0; k < width; k++)
+                {
+                    solve[j][k] -= fac * solve[i][k];
+                    inverse[j][k] -= fac * inverse[i][k];
+                }
+            }
+        }
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if ((inverse[i][j] > 0 - accuracy) && (inverse[i][j] < accuracy))
+                {
+                    inverse[i][j] = 0;
+                }
+            }
         }
         publish = Matrix(inverse.size(), inverse[0].size(), inverse);
     }
     solve.clear();
-    row.clear();
+    tempVector.clear();
+    invRow.clear();
     inverse.clear();
     return publish;
 }
