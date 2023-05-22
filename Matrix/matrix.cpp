@@ -459,10 +459,7 @@ double Matrix::trace()
 
 void Matrix::eigenValues()
 {
-//    Matrix A = Matrix(height, width, matrix);
-//    l2Norm();
-//    cout<<"Norm2: "<<norm2<<endl;
-    Matrix A = scale(1 / norm1);
+    Matrix A = scale(height * width / norm1);
 
     vector<vector<double> > poly;
     double real = 0;
@@ -473,17 +470,17 @@ void Matrix::eigenValues()
         if ((i < height - 1) && ((E[i + 1][i] > accuracy * height) || (E[i + 1][i] < 0 - accuracy * height)))
         {
             poly = polynomial(i);
-            realEigen.push_back(poly[0][0] * norm1);
-            imaginaryEigen.push_back(poly[1][0] * norm1);
-            realEigen.push_back(poly[0][1] * norm1);
-            imaginaryEigen.push_back(poly[1][1] * norm1);
+            realEigen.push_back(poly[0][0] * norm1 / (height * width));
+            imaginaryEigen.push_back(poly[1][0] * norm1 / (height * width));
+            realEigen.push_back(poly[0][1] * norm1 / (height * width));
+            imaginaryEigen.push_back(poly[1][1] * norm1 / (height * width));
             i++;
         }
         else
         {
             real = E[i][i];
             imaginary = 0;
-            realEigen.push_back(real * norm1);
+            realEigen.push_back(real * norm1 / (height * width));
             imaginaryEigen.push_back(imaginary);
         }
     }
@@ -633,10 +630,10 @@ void Matrix::QR(int n, Matrix Ea)
                 for (int j = 0; j < width; j++)
                 {
                     Q[i][j] = Qa.getMatrix()[i][j];
-                    if (i == j)
+                    /*if (i == j)
                     {
                         Q[i][j] -= add;
-                    }
+                    }*/
                 }
             }
             for (int i = 0; i < height; i++)
@@ -644,10 +641,10 @@ void Matrix::QR(int n, Matrix Ea)
                 for (int j = 0; j < width; j++)
                 {
                     R[i][j] = Ra.getMatrix()[i][j];
-                    if (i == j)
+                    /*if (i == j)
                     {
                         R[i][j] -= add;
-                    }
+                    }*/
                 }
             }
             for (int i = 0; i < height; i++)
