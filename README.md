@@ -8,8 +8,10 @@ This program demonstrates the Taylor series approximations of exponential functi
 # Matrix
 This program performs a variety of matrix operations including finding Eigenvalues and Eigenvectors, inverting, adding, cross-multiplying, and finding determinantes.
 
-# Code Created in the FLOW Lab
-This repository also contains all of the codes I create for my ME EN 497R research with the Flow Lab.
+# Code Created in the BYU FLOW Lab
+In this repository I have also stored copies of the codes I create for my research for a ME EN 497R (supervised research) courcse with the BYU FLOW Lab.
+
+### LeapFrog
 The folder labeled "LeapFrog" is the leapfrogging vortices program I completed at the beginning of the course.
 
 ### Airfoil Analysis
