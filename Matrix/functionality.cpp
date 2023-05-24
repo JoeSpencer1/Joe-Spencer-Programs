@@ -525,6 +525,22 @@ void Matrix::printEigenVec()
                     cout << imaginaryEigenVectors[i][j] << "i";
                 }
             }
+            if (((realEigenVectors[i][j] < tolerance) && (realEigenVectors[i][j] > 0 - tolerance))
+            && ((imaginaryEigenVectors[i][j] < tolerance) && (imaginaryEigenVectors[i][j] > 0 - tolerance)))
+            {
+                if (realEigenVectors[i][j] != 0)
+                {
+                    cout << realEigenVectors[i][j];
+                }
+                if (imaginaryEigenVectors[i][j] > 0)
+                {
+                    cout << " + " << imaginaryEigenVectors[i][j] << "i";
+                }
+                if (imaginaryEigenVectors[i][j] < 0)
+                {
+                    cout << " - " << (-1 * imaginaryEigenVectors[i][j]) << "i";
+                }
+            }
             cout << endl;
         }
         cout << endl;

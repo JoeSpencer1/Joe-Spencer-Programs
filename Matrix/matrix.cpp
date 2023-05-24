@@ -460,7 +460,6 @@ double Matrix::trace()
 void Matrix::eigenValues()
 {
     Matrix A = scale(height * width / norm1);
-
     vector<vector<double> > poly;
     double real = 0;
     double imaginary = 0;
@@ -630,10 +629,6 @@ void Matrix::QR(int n, Matrix Ea)
                 for (int j = 0; j < width; j++)
                 {
                     Q[i][j] = Qa.getMatrix()[i][j];
-                    /*if (i == j)
-                    {
-                        Q[i][j] -= add;
-                    }*/
                 }
             }
             for (int i = 0; i < height; i++)
@@ -641,10 +636,6 @@ void Matrix::QR(int n, Matrix Ea)
                 for (int j = 0; j < width; j++)
                 {
                     R[i][j] = Ra.getMatrix()[i][j];
-                    /*if (i == j)
-                    {
-                        R[i][j] -= add;
-                    }*/
                 }
             }
             for (int i = 0; i < height; i++)
@@ -930,7 +921,6 @@ void Matrix::l2Norm()
     {
         Matrix A = Matrix(height, width, matrix);
         Matrix A2 = A.cross(A.transpose(), false);
-A2.printMatrix();
         vector<vector<double> > normV = A2.returnEigen();
         for (int i = 0; i < normV[0].size(); i++)
         {
@@ -939,7 +929,6 @@ A2.printMatrix();
                 norm2 = (normV[0][i] * normV[0][i]) + (normV[1][i] * normV[1][i]);
             }
             norm2 = sqrt(norm2);
-cout<<norm2<<endl;
         }
         return;
     }
