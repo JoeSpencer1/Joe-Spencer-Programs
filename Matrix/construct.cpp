@@ -67,6 +67,8 @@ Matrix::Matrix(string fileName)
     Q = matrix;
     R = matrix;
     E = matrix;
+    change = numeric_limits<double>::max();
+    counter = 0;
     readMatrix.close();
     name = fileName;
     publish = true;
@@ -100,6 +102,8 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data)
     Q = matrix;
     R = matrix;
     E = matrix;
+    change = numeric_limits<double>::max();
+    counter = 0;
     publish = true;
 }
 
@@ -127,6 +131,8 @@ Matrix::Matrix(int rows, int columns, vector<vector<double> > data, bool keep)
     Q = matrix;
     R = matrix;
     E = matrix;
+    change = numeric_limits<double>::max();
+    counter = 0;
     publish = false;
 }
 
@@ -196,6 +202,8 @@ Matrix::Matrix()
     Q = matrix;
     R = matrix;
     E = matrix;
+    change = numeric_limits<double>::max();
+    counter = 0;
     publish = true;
 }
 

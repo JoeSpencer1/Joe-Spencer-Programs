@@ -88,7 +88,10 @@ private:
     vector<vector<double> > realEigenVectors;
     vector<vector<double> > imaginaryEigenVectors;
     double tolerance = 0.01;
-    double accuracy = 0.00001;
+    double accuracy = 0.000001;
+    double finest = 0.000000005;
+    double change;
+    int counter;
     vector<Matrix> matrixMenu;
     vector<int> numMenu;
     bool publish;

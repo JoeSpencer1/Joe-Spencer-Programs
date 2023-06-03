@@ -466,7 +466,7 @@ void Matrix::eigenValues()
     QR(height - 1, A);
     for (int i = 0; i < height; i++)
     {
-        if ((i < height - 1) && ((E[i + 1][i] > accuracy * height) || (E[i + 1][i] < 0 - accuracy * height)))
+        if ((i < height - 1) && ((E[i + 1][i] > accuracy) || (E[i + 1][i] < 0 - accuracy)))
         {
             poly = polynomial(i);
             realEigen.push_back(poly[0][0] * norm1 / (height * width));
@@ -506,6 +506,8 @@ void Matrix::QR(int n, Matrix Ea)
     double temDep = 0;
     double error = 0;
     double temError = 0;
+    double temChange = 0;
+    double temCounter = counter;
     vector<vector<double> > tempQ;
     vector<vector<double> > mu;
     tempQ = Ea.getMatrix();
@@ -591,11 +593,13 @@ void Matrix::QR(int n, Matrix Ea)
             double a = (Ea.getMatrix()[i][i] * Ea.getMatrix()[i + 1][i + 1]) - (Ea.getMatrix()[i + 1][i] * Ea.getMatrix()[i][i + 1]);
             double b = (Eb.getMatrix()[i][i] * Eb.getMatrix()[i + 1][i + 1]) - (Eb.getMatrix()[i + 1][i] * Eb.getMatrix()[i][i + 1]);
             temError = (a - b) * (a - b);
+            temChange += (a - b) * (a - b);
             i++;            
         }
         else
         {
             temError = (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]);
+            temChange += (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]) * (Eb.getMatrix()[i][i] - Ea.getMatrix()[i][i]);
         }
         error += temError;
         if (temError > accuracy)
@@ -609,8 +613,11 @@ void Matrix::QR(int n, Matrix Ea)
         complex += Eb.getMatrix()[i][i - 1] * Eb.getMatrix()[i][i - 1];
     }
     complex = sqrt(complex) / height;
-    if (((complex < accuracy) && (error < accuracy * accuracy * accuracy * height)) || 
-        ((complex >= accuracy * height) && (error < accuracy * accuracy * accuracy * height)))
+    if ((temChange > change) || (temChange < finest * finest / height))
+    {
+        counter++;
+    }
+    if (((temChange > change) || (temChange < finest * finest / height)) && (counter > height))
     {
         n--;
         error = 0;
@@ -651,6 +658,11 @@ void Matrix::QR(int n, Matrix Ea)
             }
             return;
         }
+    }
+    change = temChange;
+    if (counter > temCounter)
+    {
+        change = numeric_limits<double>::max();
     }
     QR(n, Eb);
 }
