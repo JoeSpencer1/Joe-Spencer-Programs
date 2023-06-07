@@ -8,7 +8,7 @@ This program performs a variety of matrix operations including finding Eigenvalu
 # Wordle
 This file contains python code that can solve Wordle puzzles quickly. It also has the option to do variations of the Wordle with different numbers of letters. To do this, The number of letters would need to be updated and *CleanList.py* run again.
 
-# Taylor-series
+# Taylor series
 This program demonstrates the Taylor series approximations of exponential functions, sine, and cosine.
 
 # Code Created in the BYU FLOW Lab
