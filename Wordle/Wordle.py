@@ -43,7 +43,7 @@ class WordsList:
     def displayAll(self):
         current = self.head
         while current:
-            #print(np.array2string(current.letters))
+            print(np.array2string(current.letters))
             current = current.next
 
     def findPosition(self, pos):
@@ -71,33 +71,38 @@ class WordsList:
                 loc = current.position
             current = current.next
         return loc
+    
+    def nWords(self, current, num):
+        current = self.head
+        while current:
+            num += 1
+            current = current.next
+        return num
 
     def returnN(self, loc):
         current = self.head
         while current.position < loc:
-            #print(np.array2string(current.letters))
+            #print(current.letters)
             current = current.next
-        return np.array2string(current.letters)
+        retstr = ''
+        for a in current.letters:
+            retstr.append(a)
+        return retstr
 
     def remove(self, current, rem):
         if rem == False:
+            #print("false")
             return current.next
         else:
             if current.prev == None:
                 self.head = current.next
-                current = current.next
-                current.prev = None
-            elif current.next == None:
-                self.tail = current.prev
-                current = current.prev
-                current.next = None
+                if current.next is not None:
+                    current.next.prev = None
             else:
-                nex = current.next
-                last = current.prev
-                last.next = nex
-                nex.prev = last
-                current = current.next
-        return current
+                current.prev.next = current.next
+                if current.next is not None:
+                    current.next.prev = current.prev
+        return current.next
 
     def removeL(self, pos, ent, freq):
         rem = False
@@ -110,11 +115,13 @@ class WordsList:
             if ent == '-':
                 rem = True
                 rem2 = False
-                n = 0
-                for i in range(n):
-                    if current.letters[i] == ent:
+                i = 0
+
+                
+                for j in range(i):
+                    if current.letters[j] == ent:
                         rem = False
-                        if i == pos:
+                        if j == pos:
                             rem2 = True
                 if rem2 == True:
                     rem = True
@@ -174,6 +181,7 @@ for i in range(len(rfile)):
 
 #print('f', freq['f'][:])
 #words.displayAll()
+print(words.nWords(words.head, 0))
 #print(words.returnL())
 #print(words.findPosition(100).returnL())
 
@@ -210,4 +218,6 @@ while valid == False:
 # Return results to program
 for i in range(n):
     freq = words.removeL(i, result[i * 2], freq)
+words.displayAll()
+print(words.nWords(words.head, 0))
 
