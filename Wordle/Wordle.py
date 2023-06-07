@@ -104,35 +104,48 @@ class WordsList:
                     current.next.prev = current.prev
         return current.next
 
-    def removeL(self, pos, ent, freq):
+    def removeL(self, pos, ent, res, freq):
         rem = False
         current = self.head
         while current:
-            if ent == '0':
+            rem = False
+            if res == '-':
                 for i in range(len(current.letters)):
+                    print('-', current.letters[i])
                     if current.letters[i] == ent:
                         rem = True
-            if ent == '-':
+            if res == '*':
                 rem = True
                 rem2 = False
-                i = 0
-
-                
-                for j in range(i):
-                    if current.letters[j] == ent:
+                for i in range(n):
+                    print('*', current.letters[i])
+                    if current.letters[i] == ent:
                         rem = False
-                        if j == pos:
+                        if i == pos:
                             rem2 = True
                 if rem2 == True:
                     rem = True
-            if ent.islower():
-                if current.letters[pos] != ent:
-                    rem = True
+            if res.islower() and current.letters[pos] != ent:
+                rem = True
+                print('islower', ent, current.letters[pos])
+            if current.letters.all == 'alter':
+                print('Not deleted')
             if rem == True:
-                counter = 0
+                loc = 0
                 for letter in current.letters:
-                    freq[letter][counter] -= 1
-                    counter += 1
+                    rep = 0
+                    for i in range(0, loc):
+                        if letter == current.letters[loc]:
+                            rep += 1
+                    freq[current.letters[loc]][loc] -= 1
+                    freq[current.letters[loc]][3 * n] -= 1
+                    if rep > 0:
+                        freq[current.letters[loc]][loc + n] -= 1
+                        freq[current.letters[loc]][3 * n + 1] -= 1
+                    if rep > 1:
+                        freq[current.letters[loc]][loc + 2 * n] -= 1
+                        freq[current.letters[loc]][3 * n + 2] -= 1
+                    loc += 1
             current = self.remove(current, rem)
         return freq
 
@@ -152,7 +165,7 @@ for a in abc:
 
 # Print starting message
 print("This code will estimate the best word to enter.")
-print("An \"0\" indicates a letter not in the word, a \"-\" is in the wrong place,")
+print("An \"-\" indicates a letter not in the word, a \"*\" is in the wrong place,")
 print("and outputting the letter itself that it is correct.")
 
 # Add all letters to the hash table
@@ -206,7 +219,7 @@ while valid == False:
     valid = True
     result = input("Please enter the results of this wordle guess:\n")
     for i in range(n * 2 - 1):
-        if ((i % 2) == 0) & (valid == True) & (result[i] != test[int(i / 2)]) & (result[i] != '0') & (result[i] != '-'):
+        if ((i % 2) == 0) & (valid == True) & (result[i] != test[int(i / 2)]) & (result[i] != '*') & (result[i] != '-'):
             valid = False
             print("n")
         if ((i & 2) == 1) & (valid == True) & (result[i] != ' '):
@@ -217,7 +230,7 @@ while valid == False:
 
 # Return results to program
 for i in range(n):
-    freq = words.removeL(i, result[i * 2], freq)
+    freq = words.removeL(i, test[i], result[i * 2], freq)
 words.displayAll()
 print(words.nWords(words.head, 0))
 
