@@ -14,7 +14,6 @@ valid = True
 for i in range(len(rfile)):
     if rfile[i].islower():
         length += 1
-        #print(length, valid)
     elif (rfile[i] == '\n') or (i == len(rfile)):
         if length != 5:
             valid = False
