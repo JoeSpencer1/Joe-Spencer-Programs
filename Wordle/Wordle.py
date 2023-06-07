@@ -111,14 +111,14 @@ class WordsList:
             rem = False
             if res == '-':
                 for i in range(len(current.letters)):
-                    print('-', current.letters[i])
+                    #print('-', current.letters[i])
                     if current.letters[i] == ent:
                         rem = True
             if res == '*':
                 rem = True
                 rem2 = False
                 for i in range(n):
-                    print('*', current.letters[i])
+                    #print('*', current.letters[i])
                     if current.letters[i] == ent:
                         rem = False
                         if i == pos:
@@ -127,15 +127,15 @@ class WordsList:
                     rem = True
             if res.islower() and current.letters[pos] != ent:
                 rem = True
-                print('islower', ent, current.letters[pos])
-            if current.letters.all == 'alter':
-                print('Not deleted')
+                #print('islower', ent, current.letters[pos])
+            #if current.letters.all == 'alter':
+                #print('Not deleted')
             if rem == True:
                 loc = 0
                 for letter in current.letters:
                     rep = 0
                     for i in range(0, loc):
-                        if letter == current.letters[loc]:
+                        if letter == current.letters[i]:
                             rep += 1
                     freq[current.letters[loc]][loc] -= 1
                     freq[current.letters[loc]][3 * n] -= 1
@@ -145,6 +145,7 @@ class WordsList:
                     if rep > 1:
                         freq[current.letters[loc]][loc + 2 * n] -= 1
                         freq[current.letters[loc]][3 * n + 2] -= 1
+                    print(rep)
                     loc += 1
             current = self.remove(current, rem)
         return freq
@@ -184,10 +185,13 @@ for i in range(len(rfile)):
                 rep += 1
                 #print("REP", i, ' ', j, rep)
         freq[rfile[i]][i % n] += 1
+        freq[rfile[i]][3 * n] += 1
         if rep > 0:
             freq[rfile[i]][n + i % n] += 1
+            freq[rfile[i]][3 * n + 1] += 1
         if rep > 1:
             freq[rfile[i]][2 * n + i % n] += 1
+            freq[rfile[i]][3 * n + 2] += 1
         # This code assumes letters are not repeated more than 3 times.
         # It could have to be adjusted for other versions of Wordle.
 
@@ -197,15 +201,6 @@ for i in range(len(rfile)):
 #print(words.nWords(words.head, 0))
 #print(words.returnL())
 #print(words.findPosition(100).returnL())
-
-# Find the frequency of each letter
-found = False
-for a in abc:
-    for i in range(n):
-        freq[a][3 * n] += freq[a][i]
-        freq[a][3 * n + 1] += freq[a][n + i]
-        freq[a][3 * n + 2] += freq[a][2 * n + i]
-    #print(freq[a][15:18])
 
 # Find out which word has the highest score
 loc = words.highScore(freq)
@@ -231,9 +226,7 @@ while valid == False:
 # Return results to program
 for i in range(n):
     freq = words.removeL(i, test[i], result[i * 2], freq)
-words.displayAll()
-print(words.nWords(words.head, 0))
-
+#words.displayAll()
+#print(words.nWords(words.head, 0))
 for a in abc:
-    for i in range(n):
-        print(freq[a][15:18])
+    print(freq[a][15:18])
