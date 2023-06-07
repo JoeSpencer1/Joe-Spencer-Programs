@@ -52,24 +52,25 @@ class WordsList:
             current = current.next
         return current
     
-    def highScore(self, fre):
-        high = 0
-        loc = 0
-        current = self.head
-        while current:
-            score = 0
-            list = []
-            for i in current.letters:
-                rep = 0
-                for let in list:
-                    if let == i:
-                        rep += 1
-                list.append(i)
-                score += fre[i][3 * n + rep]
-            if score > high:
-                high = score
-                loc = current.position
-            current = current.next
+    def highScore(self, fre, typ):
+        if typ == 1:
+            high = 0
+            loc = 0
+            current = self.head
+            while current:
+                score = 0
+                list = []
+                for i in current.letters:
+                    rep = 0
+                    for let in list:
+                        if let == i:
+                            rep += 1
+                    list.append(i)
+                    score += fre[i][3 * n + rep]
+                if score > high:
+                    high = score
+                    loc = current.position
+                current = current.next
         return loc
     
     def nWords(self, current, num):
@@ -203,7 +204,7 @@ for i in range(len(rfile)):
 #print(words.findPosition(100).returnL())
 
 # Find out which word has the highest score
-loc = words.highScore(freq)
+loc = words.highScore(freq, 1)
 #print(loc)
 test = words.findPosition(loc).returnL()
 print(test)
@@ -228,5 +229,5 @@ for i in range(n):
     freq = words.removeL(i, test[i], result[i * 2], freq)
 #words.displayAll()
 #print(words.nWords(words.head, 0))
-for a in abc:
-    print(freq[a][15:18])
+#for a in abc:
+    #print(freq[a][15:18])
