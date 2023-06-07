@@ -194,7 +194,7 @@ for i in range(len(rfile)):
 
 #print('f', freq['f'][:])
 #words.displayAll()
-print(words.nWords(words.head, 0))
+#print(words.nWords(words.head, 0))
 #print(words.returnL())
 #print(words.findPosition(100).returnL())
 
@@ -234,3 +234,6 @@ for i in range(n):
 words.displayAll()
 print(words.nWords(words.head, 0))
 
+for a in abc:
+    for i in range(n):
+        print(freq[a][15:18])
